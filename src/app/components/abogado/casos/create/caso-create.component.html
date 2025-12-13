@@ -1,0 +1,104 @@
+<div class="caso-create-container">
+  <!-- Header -->
+  <div class="mb-4">
+    <h2 class="h4 mb-2">Nuevo Caso Judicial</h2>
+    <p class="text-muted">Complete el formulario para registrar un nuevo caso</p>
+  </div>
+
+  <!-- Formulario -->
+  <div class="card">
+    <form [formGroup]="casoForm" (ngSubmit)="onSubmit()">
+      <div class="row g-3">
+        <!-- Información básica -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Número de Caso *</label>
+          <input pInputText formControlName="numeroCaso" 
+                 placeholder="Ej: CASO-2024-0001" class="w-100">
+          <div *ngIf="numeroCaso?.invalid && (numeroCaso?.dirty || numeroCaso?.touched)" 
+               class="invalid-feedback d-block">
+            <small *ngIf="numeroCaso?.errors?.['required']">Este campo es requerido</small>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Tipo de Caso *</label>
+          <select class="form-select">
+          </select>
+        </div>
+
+        <!-- Abogado y Patrocinado -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Abogado *</label>
+          <input pInputText formControlName="abogado" 
+                 placeholder="Nombre del abogado" class="w-100">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Patrocinado *</label>
+          <input pInputText formControlName="patrocinado" 
+                 placeholder="Nombre del cliente" class="w-100">
+        </div>
+
+        <!-- Fechas -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Fecha de Ingreso *</label>
+          <input type="date" class="form-control" formControlName="fechaIngreso">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Fecha de Vencimiento *</label>
+          <input type="date" class="form-control" formControlName="fechaVencimiento">
+        </div>
+
+        <!-- Dependencia y Estado -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Dependencia *</label>
+          <select class="form-select">
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Estado *</label>
+          <select class="form-select">
+          </select>
+        </div>
+
+        <!-- Descripción -->
+        <div class="col-12">
+          <label class="form-label fw-semibold">Descripción / Opción de Llenado</label>
+          <textarea pInputTextarea formControlName="opcionLlenado" 
+                    [rows]="4" placeholder="Describa el caso..." 
+                    class="w-100"></textarea>
+          <div class="form-text">
+            Describa los detalles del caso, hechos relevantes y cualquier información importante.
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="col-12">
+          <div class="d-flex justify-content-end gap-3 mt-4">
+            <button type="button" label="Cancelar" 
+                    class="btn btn-primary" 
+                    routerLink="/abogado/casos">
+            </button>
+            <button type="submit" label="Guardar Caso" 
+                    [disabled]="casoForm.invalid || isLoading" 
+                     >
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Información adicional -->
+  <div class="alert alert-info mt-4">
+    <h6 class="alert-heading"><i class="pi pi-info-circle me-2"></i>Información importante</h6>
+    <ul class="mb-0">
+      <li>El número de caso debe ser único en el sistema</li>
+      <li>La fecha de vencimiento debe ser posterior a la fecha de ingreso</li>
+      <li>Los campos marcados con * son obligatorios</li>
+      <li>Una vez creado el caso, podrá agregar seguimientos y documentos</li>
+    </ul>
+  </div>
+</div>

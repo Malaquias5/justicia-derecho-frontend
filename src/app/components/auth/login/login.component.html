@@ -1,0 +1,126 @@
+<div class="login-container">
+  <div class="login-card-wrapper">
+    <div class="login-card">
+      <!-- Header -->
+      <div class="login-header">
+        <div class="logo-circle">
+          <i class="bi bi-bank2"></i>
+        </div>
+        <h2 class="login-title">Sistema Judicial BCI</h2>
+        <p class="login-subtitle">Inicia sesión para continuar</p>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <!-- Usuario -->
+        <div class="form-group">
+          <label for="usuario" class="form-label">
+            <i class="bi bi-person-circle me-2"></i>Usuario
+          </label>
+          <div class="input-wrapper">
+            <input 
+              type="text" 
+              id="usuario"
+              class="form-control"
+              formControlName="usuario"
+              placeholder="Ingrese su usuario"
+              [class.is-invalid]="usuario?.invalid && (usuario?.dirty || usuario?.touched)">
+            <i class="bi bi-person input-icon"></i>
+          </div>
+          <div *ngIf="usuario?.invalid && (usuario?.dirty || usuario?.touched)" class="error-message">
+            <small *ngIf="usuario?.errors?.['required']">El usuario es requerido</small>
+            <small *ngIf="usuario?.errors?.['minlength']">Mínimo 3 caracteres</small>
+          </div>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group">
+          <label for="password" class="form-label">
+            <i class="bi bi-shield-lock me-2"></i>Contraseña
+          </label>
+          <div class="input-wrapper">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password"
+              class="form-control"
+              formControlName="password"
+              placeholder="Ingrese su contraseña"
+              [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)">
+            <i class="bi bi-lock input-icon"></i>
+            <button 
+              type="button" 
+              class="toggle-password"
+              (click)="togglePasswordVisibility()">
+              <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </button>
+          </div>
+          <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error-message">
+            <small *ngIf="password?.errors?.['required']">La contraseña es requerida</small>
+            <small *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</small>
+          </div>
+        </div>
+
+        <!-- Botón de submit -->
+        <button 
+          type="submit" 
+          class="btn-login"
+          [disabled]="loginForm.invalid || isLoading">
+          <span *ngIf="!isLoading">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+          </span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-2"></span>Iniciando...
+          </span>
+        </button>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span>¿No tienes una cuenta?</span>
+        </div>
+
+        <!-- Registro -->
+        <a routerLink="/auth/register" class="btn-register">
+          <i class="bi bi-person-plus me-2"></i>Crear cuenta
+        </a>
+
+      </form>
+
+      <!-- Usuarios de prueba -->
+      <div class="demo-users">
+        <div class="demo-header">
+          <i class="bi bi-info-circle me-2"></i>
+          <span>Usuarios de prueba</span>
+        </div>
+        <div class="demo-list">
+          <div class="demo-user">
+            <div class="demo-badge admin">
+              <i class="bi bi-shield-fill-check"></i>
+            </div>
+            <div class="demo-info">
+              <strong>Administrador</strong>
+              <span>admin / admin123</span>
+            </div>
+          </div>
+          <div class="demo-user">
+            <div class="demo-badge abogado">
+              <i class="bi bi-briefcase-fill"></i>
+            </div>
+            <div class="demo-info">
+              <strong>Abogado</strong>
+              <span>abogado1 / abogado123</span>
+            </div>
+          </div>
+          <div class="demo-user">
+            <div class="demo-badge usuario">
+              <i class="bi bi-person-fill"></i>
+            </div>
+            <div class="demo-info">
+              <strong>Usuario</strong>
+              <span>usuario1 / usuario123</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

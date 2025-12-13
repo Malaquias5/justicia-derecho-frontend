@@ -1,0 +1,94 @@
+<div class="admin-dashboard">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-2">Panel de Administración</h1>
+    <p class="text-muted">Bienvenido al sistema de gestión judicial</p>
+  </div>
+
+  <!-- Estadísticas rápidas -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3" *ngFor="let stat of stats">
+      <div class="card">
+        <h2 class="display-6 fw-bold" [ngClass]="stat.colorClass">{{ stat.value }}</h2>
+        <p class="text-muted small">{{ stat.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row mb-4">
+    <div class="col-md-8 mb-3">
+      <div class="card">
+        <canvas></canvas>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card">
+        <div *ngFor="let activity of recentActivity" class="activity-item mb-3">
+          <div class="d-flex align-items-center">
+            <i [class]="activity.icon" class="me-2" [ngClass]="activity.iconClass"></i>
+            <div>
+              <div class="fw-semibold">{{ activity.title }}</div>
+              <div class="text-muted small">{{ activity.description }}</div>
+              <div class="text-muted small">{{ activity.time }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de casos urgentes -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <table class="table">
+          <ng-template>
+            <tr>
+              <th>N° Caso</th>
+              <th>Abogado</th>
+              <th>Patrocinado</th>
+              <th>Vencimiento</th>
+              <th>Días Restantes</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-caso>
+            <tr>
+              <td class="fw-bold">{{ caso.numeroCaso }}</td>
+              <td>{{ caso.abogado }}</td>
+              <td>{{ caso.patrocinado }}</td>
+              <td>{{ caso.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span [ngClass]="{
+                  'text-danger': caso.diasRestantes <= 3,
+                  'text-warning': caso.diasRestantes > 3 && caso.diasRestantes <= 7,
+                  'text-success': caso.diasRestantes > 7
+                }">
+                  {{ caso.diasRestantes }} días
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getEstadoClass(caso.estado)">{{ caso.estado }}</span>
+              </td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template>
+            <tr>
+              <td colspan="7" class="text-center py-4">
+                <i class="pi pi-info-circle me-2"></i>
+                No hay casos urgentes
+              </td>
+            </tr>
+          </ng-template>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

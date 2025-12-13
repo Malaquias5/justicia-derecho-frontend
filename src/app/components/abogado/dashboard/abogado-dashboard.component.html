@@ -1,0 +1,159 @@
+<div class="abogado-dashboard">
+  <!-- Bienvenida -->
+  <div class="card bg-primary text-white mb-4">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h3 class="mb-2">Bienvenido, {{ user?.nombreCompleto || 'Abogado' }}</h3>
+          <p class="mb-0">Aquí puedes gestionar tus casos y ver el estado de tus actividades.</p>
+        </div>
+        <div class="col-md-4 text-end">
+          <i class="pi pi-briefcase" style="font-size: 4rem; opacity: 0.5;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas rápidas -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Mis Casos</h6>
+              <h3 class="mb-0">{{ totalCasos }}</h3>
+            </div>
+            <i class="pi pi-folder text-primary" style="font-size: 2rem"></i>
+          </div>
+          <div class="mt-2">
+            <small class="text-success">
+              <i class="pi pi-arrow-up"></i> 12% vs mes anterior
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Pendientes</h6>
+              <h3 class="mb-0">{{ casosPendientes }}</h3>
+            </div>
+            <i class="pi pi-clock text-warning" style="font-size: 2rem"></i>
+          </div>
+          <div class="mt-2">
+            <small class="text-danger">
+              <i class="pi pi-exclamation-triangle"></i> {{ pendientesUrgentes }} urgentes
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">En Proceso</h6>
+              <h3 class="mb-0">{{ casosEnProceso }}</h3>
+            </div>
+            <i class="pi pi-cog text-info" style="font-size: 2rem"></i>
+          </div>
+          <div class="mt-2">
+            <small class="text-info">
+              <i class="pi pi-sync"></i> En seguimiento
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Finalizados</h6>
+              <h3 class="mb-0">{{ casosFinalizados }}</h3>
+            </div>
+            <i class="pi pi-check-circle text-success" style="font-size: 2rem"></i>
+          </div>
+          <div class="mt-2">
+            <small class="text-success">
+              <i class="pi pi-chart-line"></i> 94% eficiencia
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Casos urgentes -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card">
+        <table class="table">
+          <ng-template>
+            <tr>
+              <th>N° Caso</th>
+              <th>Patrocinado</th>
+              <th>Vencimiento</th>
+              <th>Días</th>
+              <th>Acciones</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-caso>
+            <tr [ngClass]="{'table-danger': caso.diasRestantes <= 3}">
+              <td class="fw-bold">{{ caso.numeroCaso }}</td>
+              <td>{{ caso.patrocinado }}</td>
+              <td>{{ caso.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="badge bg-danger">{{ caso.diasRestantes }} días</span>
+              </td>
+              <td>
+                <button  
+                  class="btn btn-primary"
+                  [routerLink]="['/abogado/casos', caso.idRegistro]">
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </table>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="d-grid gap-2">
+          <button label="Nuevo Caso" 
+             
+            class="mb-2"
+            routerLink="/abogado/casos/nuevo">
+          </button>
+          <button label="Agregar Seguimiento" 
+             
+            class="mb-2 p-button-outlined">
+          </button>
+          <button label="Subir Documento" 
+             
+            class="mb-2 p-button-outlined">
+          </button>
+          <button label="Ver Calendario" 
+             
+            class="btn btn-primary">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico de casos por estado -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <canvas></canvas>
+      </div>
+    </div>
+  </div>
+</div>

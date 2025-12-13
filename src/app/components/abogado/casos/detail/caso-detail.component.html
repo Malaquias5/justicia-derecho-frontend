@@ -1,0 +1,212 @@
+<div class="caso-detail-container">
+  <!-- Header con acciones -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-2">Detalle del Caso</h2>
+      <p class="text-muted mb-0">{{ caso?.numeroCaso }}</p>
+    </div>
+    <div class="btn-group">
+      <button label="Editar" 
+         
+        class="me-2"
+        [routerLink]="['/abogado/casos/editar', id]">
+      </button>
+      <button label="Volver" 
+         
+        class="btn btn-primary"
+        routerLink="/abogado/casos">
+      </button>
+    </div>
+  </div>
+
+  <!-- Información principal -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Número de Caso</label>
+            <p class="fw-bold fs-5">{{ caso?.numeroCaso }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Estado</label>
+            <div>
+              <span class="badge" [ngClass]="getEstadoClass(caso?.estado)">{{ caso?.estado }}</span>
+              <span class="badge ms-2" [ngClass]="getUrgenciaClass(caso?.nivelUrgencia)">{{ caso?.nivelUrgencia }}</span>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Abogado</label>
+            <p>{{ caso?.abogado }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Patrocinado</label>
+            <p>{{ caso?.patrocinado }}</p>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Tipo de Caso</label>
+            <p>{{ caso?.tipoCaso }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Dependencia</label>
+            <p>{{ caso?.dependencia }}</p>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Fecha de Ingreso</label>
+            <p>{{ caso?.fechaIngreso | date:'dd/MM/yyyy' }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold text-muted">Fecha de Vencimiento</label>
+            <p [ngClass]="{'text-danger fw-bold': caso?.diasRestantes <= 3}">
+              {{ caso?.fechaVencimiento | date:'dd/MM/yyyy' }}
+              <span class="text-muted">({{ caso?.diasRestantes }} días restantes)</span>
+            </p>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label fw-semibold text-muted">Descripción</label>
+            <div class="card bg-light">
+              <div class="card-body">
+                <p class="mb-0">{{ caso?.opcionLlenado || 'Sin descripción' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel derecho -->
+    <div class="col-md-4">
+      <!-- Información adicional -->
+      <div class="card">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Registrado por:</span>
+            <span class="fw-semibold">{{ caso?.usuarioRegistro }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Fecha registro:</span>
+            <span>{{ caso?.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Última actualización:</span>
+            <span>{{ caso?.fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Acciones rápidas -->
+      <div class="card">
+        <div class="d-grid gap-2">
+          <button label="Agregar Seguimiento" 
+             
+            class="mb-2">
+          </button>
+          <button label="Subir Documento" 
+             
+            class="mb-2 p-button-outlined">
+          </button>
+          <button label="Cambiar Estado" 
+             
+            class="btn btn-primary">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs para seguimientos y documentos -->
+  <ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="seguimientos-tab" data-bs-toggle="tab" data-bs-target="#seguimientos" type="button" role="tab">
+        <i class="bi bi-list-ul me-2"></i>Seguimientos
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab">
+        <i class="bi bi-file-earmark me-2"></i>Documentos
+      </button>
+    </li>
+  </ul>
+  
+  <div class="tab-content">
+    <!-- Tab Seguimientos -->
+    <div class="tab-pane fade show active" id="seguimientos" role="tabpanel">
+      <div class="d-flex justify-content-between mb-3">
+        <h5 class="mb-0">Historial de Seguimientos</h5>
+        <button label="Nuevo Seguimiento" 
+           
+          size="small">
+        </button>
+      </div>
+      
+      <div *ngIf="seguimientos.length === 0" class="text-center py-5">
+        <i class="pi pi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+        <p class="text-muted mt-3">No hay seguimientos registrados</p>
+      </div>
+
+      <div *ngFor="let seguimiento of seguimientos" class="timeline-item mb-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1">{{ seguimiento.tipoMovimiento }}</h6>
+                <p class="mb-2">{{ seguimiento.descripcion }}</p>
+                <small class="text-muted">
+                  Registrado por {{ seguimiento.usuarioRegistro }} · 
+                  {{ seguimiento.fechaSeguimiento | date:'dd/MM/yyyy HH:mm' }}
+                </small>
+              </div>
+              <span class="badge bg-light text-dark">
+                #{{ seguimiento.numeroSeguimiento }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Documentos -->
+    <div class="tab-pane fade" id="documentos" role="tabpanel">
+      <div class="d-flex justify-content-between mb-3">
+        <h5 class="mb-0">Documentos Adjuntos</h5>
+        <button label="Subir Documento" 
+           
+          size="small">
+        </button>
+      </div>
+
+      <table class="table">
+        <ng-template>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Tamaño</th>
+            <th>Fecha</th>
+            <th>Subido por</th>
+            <th>Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-doc>
+          <tr>
+            <td class="fw-semibold">{{ doc.nombreArchivo }}</td>
+            <td>
+              <span class="badge bg-info">{{ doc.tipoDocumento }}</span>
+            </td>
+            <td>{{ formatBytes(doc.tamanoBytes) }}</td>
+            <td>{{ doc.fechaCarga | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ doc.usuarioCarga }}</td>
+            <td>
+              <button type="button" class="btn btn-sm btn-primary">
+                <i class="bi bi-download"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+</div>

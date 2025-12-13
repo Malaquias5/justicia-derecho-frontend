@@ -1,0 +1,30 @@
+.caso-detail-container {
+  padding: 20px 0;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #4c6ef5;
+  border-radius: 2px;
+}
+
+.list-group-item {
+  border: none;
+  padding: 0.75rem 0;
+  background-color: transparent;
+}
+
+.badge {
+  font-size: 0.875rem;
+  padding: 0.35em 0.65em;
+}

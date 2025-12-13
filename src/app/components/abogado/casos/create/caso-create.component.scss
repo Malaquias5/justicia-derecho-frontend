@@ -1,0 +1,51 @@
+.caso-create-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-label {
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+  
+  .alert-heading {
+    color: #0c5460;
+    font-weight: 600;
+  }
+  
+  ul {
+    padding-left: 1.5rem;
+    
+    li {
+      margin-bottom: 0.5rem;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .p-calendar,
+  .p-dropdown {
+    width: 100% !important;
+  }
+  
+  .p-inputtext,
+  .p-inputtextarea {
+    width: 100%;
+  }
+}

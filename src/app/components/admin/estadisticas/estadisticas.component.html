@@ -1,0 +1,162 @@
+<div class="estadisticas-container">
+  <!-- Header -->
+  <div class="mb-4">
+    <h2 class="h4 mb-2">Estadísticas del Sistema</h2>
+    <p class="text-muted">Análisis detallado del rendimiento y actividad</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-3">
+          <label class="form-label">Período</label>
+          <select class="form-select" [(ngModel)]="periodo" (change)="cargarEstadisticas()">
+            <option value="30">Últimos 30 días</option>
+            <option value="90">Últimos 3 meses</option>
+            <option value="180">Últimos 6 meses</option>
+            <option value="365">Último año</option>
+          </select>
+        </div>
+        <div class="col-md-9 d-flex justify-content-end">
+          <div class="btn-group">
+            <button label="Exportar PDF"  class="me-2"></button>
+            <button label="Exportar Excel" ></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas principales -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card border-start border-primary border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Total Usuarios</h6>
+              <h3 class="mb-0">{{ estadisticas?.totalUsuarios || 0 }}</h3>
+            </div>
+            <i class="pi pi-users text-primary" style="font-size: 2rem"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-start border-success border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Total Casos</h6>
+              <h3 class="mb-0">{{ estadisticas?.totalCasos || 0 }}</h3>
+            </div>
+            <i class="pi pi-folder text-success" style="font-size: 2rem"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-start border-warning border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Casos Activos</h6>
+              <h3 class="mb-0">{{ estadisticas?.casosActivos || 0 }}</h3>
+            </div>
+            <i class="pi pi-briefcase text-warning" style="font-size: 2rem"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card border-start border-danger border-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-2">Casos Vencidos</h6>
+              <h3 class="mb-0">{{ estadisticas?.casosVencidos || 0 }}</h3>
+            </div>
+            <i class="pi pi-exclamation-triangle text-danger" style="font-size: 2rem"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row mb-4">
+    <div class="col-md-8 mb-3">
+      <div class="card">
+        <canvas></canvas>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Administradores
+            <span class="badge bg-primary rounded-pill">{{ estadisticas?.totalAdmin || 0 }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Abogados
+            <span class="badge bg-info rounded-pill">{{ estadisticas?.totalAbogados || 0 }}</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Usuarios
+            <span class="badge bg-success rounded-pill">{{ estadisticas?.totalUsuariosNormales || 0 }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de estadísticas por abogado -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Rendimiento por Abogado</h5>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <ng-template>
+          <tr>
+            <th>Abogado</th>
+            <th>Total Casos</th>
+            <th>Pendientes</th>
+            <th>En Proceso</th>
+            <th>Finalizados</th>
+            <th>Vencidos</th>
+            <th>Eficiencia</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-estadistica>
+          <tr>
+            <td class="fw-semibold">{{ estadistica.abogado }}</td>
+            <td>{{ estadistica.totalCasos }}</td>
+            <td>
+              <span class="badge bg-warning">{{ estadistica.casosPendientes }}</span>
+            </td>
+            <td>
+              <span class="badge bg-info">{{ estadistica.casosEnProceso }}</span>
+            </td>
+            <td>
+              <span class="badge bg-success">{{ estadistica.casosFinalizados }}</span>
+            </td>
+            <td>
+              <span class="badge bg-danger">{{ estadistica.casosVencidos }}</span>
+            </td>
+            <td>
+              <span [ngClass]="{
+                'text-success fw-bold': getEficiencia(estadistica) >= 80,
+                'text-warning': getEficiencia(estadistica) >= 60 && getEficiencia(estadistica) < 80,
+                'text-danger': getEficiencia(estadistica) < 60
+              }">
+                {{ getEficiencia(estadistica) }}%
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+</div>

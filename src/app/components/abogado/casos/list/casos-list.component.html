@@ -1,0 +1,163 @@
+<div class="casos-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-2">Mis Casos</h2>
+      <p class="text-muted mb-0">Gestiona todos tus casos judiciales</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button label="Nuevo Caso" 
+         
+        routerLink="/abogado/casos/nuevo">
+      </button>
+      <button label="Filtrar" 
+         
+        class="btn btn-primary"
+        (click)="mostrarFiltros = !mostrarFiltros">
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div *ngIf="mostrarFiltros" class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Número de Caso</label>
+          <input pInputText [(ngModel)]="filtros.numeroCaso" 
+                 placeholder="Ej: CASO-2024-0001" class="w-100">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Estado</label>
+          <select class="form-select">
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha Desde</label>
+          <input type="date" class="form-control" [(ngModel)]="filtros.fechaDesde">
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <div class="d-flex gap-2 w-100">
+            <button label="Aplicar"  
+                    class="flex-grow-1" (click)="aplicarFiltros()">
+            </button>
+            <button label="Limpiar"  
+                    class="btn btn-primary" (click)="limpiarFiltros()">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de casos -->
+  <div class="card">
+    <table class="table">
+      
+      <ng-template>
+        <tr>
+          <th>N° Caso</th>
+          <th>Patrocinado</th>
+          <th>Tipo</th>
+          <th>Ingreso</th>
+          <th>Vencimiento</th>
+          <th>Estado</th>
+          <th>Urgencia</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-caso>
+        <tr [ngClass]="{'table-warning': caso.nivelUrgencia === 'Urgente'}">
+          <td>
+            <div class="fw-bold">{{ caso.numeroCaso }}</div>
+            <div class="text-muted small">{{ caso.dependencia }}</div>
+          </td>
+          <td>{{ caso.patrocinado }}</td>
+          <td>{{ caso.tipoCaso }}</td>
+          <td>{{ caso.fechaIngreso | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div [ngClass]="{
+              'text-danger fw-bold': caso.diasRestantes <= 3,
+              'text-warning': caso.diasRestantes > 3 && caso.diasRestantes <= 7
+            }">
+              {{ caso.fechaVencimiento | date:'dd/MM/yyyy' }}
+            </div>
+            <div class="text-muted small">
+              {{ caso.diasRestantes }} días restantes
+            </div>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getEstadoClass(caso.estado)">{{ caso.estado }}</span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getUrgenciaClass(caso.nivelUrgencia)">{{ caso.nivelUrgencia }}</span>
+          </td>
+          <td>
+            <div class="d-flex gap-1">
+              <button  
+                class="btn btn-primary"
+                [routerLink]="['/abogado/casos', caso.idRegistro]"
+                >
+              </button>
+              <button  
+                class="btn btn-primary"
+                [routerLink]="['/abogado/casos/editar', caso.idRegistro]"
+                >
+              </button>
+              <button  
+                class="btn btn-primary"
+                >
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template>
+        <tr>
+          <td colspan="8" class="text-center py-4">
+            <i class="pi pi-folder-open me-2"></i>
+            No hay casos registrados
+          </td>
+        </tr>
+      </ng-template>
+    </table>
+  </div>
+
+  <!-- Resumen -->
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h6 class="card-title">Total Casos</h6>
+          <h3 class="mb-0">{{ totalCasos }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <h6 class="card-title">Pendientes</h6>
+          <h3 class="mb-0">{{ casosPendientes }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <h6 class="card-title">En Proceso</h6>
+          <h3 class="mb-0">{{ casosEnProceso }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h6 class="card-title">Finalizados</h6>
+          <h3 class="mb-0">{{ casosFinalizados }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<div class="usuarios-container">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-2">Gestión de Usuarios</h2>
+      <p class="text-muted mb-0">Administra los usuarios del sistema</p>
+    </div>
+    <button label="Nuevo Usuario" 
+       
+      (click)="showNuevoUsuarioDialog()">
+    </button>
+  </div>
+
+  <!-- Tabla de usuarios -->
+  <div class="card">
+    <!-- Header con filtro -->
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="input-group w-50">
+          <span class="input-group-text">
+            <i class="bi bi-search"></i>
+          </span>
+          <input type="text" 
+                 placeholder="Buscar usuarios..." 
+                 class="form-control"
+                 [(ngModel)]="searchTerm"
+                 (input)="filtrarUsuarios()">
+        </div>
+        <span class="text-muted">Total: {{ usuariosFiltrados.length }} usuarios</span>
+      </div>
+
+      <!-- Tabla -->
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Nombre Completo</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Fecha Registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of usuariosFiltrados">
+            <td>{{ usuario.idUsuario }}</td>
+            <td class="fw-semibold">{{ usuario.usuario }}</td>
+            <td>{{ usuario.nombreCompleto }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              <span class="badge" [ngClass]="getUsuarioRolClass(usuario.rol)">{{ usuario.rol }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="usuario.activo ? 'bg-success' : 'bg-secondary'">
+                {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>{{ usuario.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <div class="d-flex gap-1">
+                <button type="button" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" title="Editar" (click)="editarUsuario(usuario)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-warning" 
+                        [title]="usuario.activo ? 'Desactivar' : 'Activar'"
+                        (click)="toggleUsuarioEstado(usuario)">
+                  <i [class]="usuario.activo ? 'bi bi-ban' : 'bi bi-check'"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="usuariosFiltrados.length === 0">
+            <td colspan="8" class="text-center py-4">
+              <i class="bi bi-people me-2"></i>
+              No hay usuarios registrados
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Diálogo nuevo usuario -->
+  <div class="modal">
+    <form (ngSubmit)="guardarUsuario()" #usuarioForm="ngForm">
+      <div class="p-fluid grid">
+        <div class="field col-12 mb-3">
+          <label for="usuario">Usuario *</label>
+          <input id="usuario" pInputText [(ngModel)]="nuevoUsuario.usuario" 
+                 name="usuario" required minlength="3" class="w-100">
+        </div>
+
+        <div class="field col-12 mb-3">
+          <label for="nombreCompleto">Nombre Completo *</label>
+          <input id="nombreCompleto" pInputText [(ngModel)]="nuevoUsuario.nombreCompleto" 
+                 name="nombreCompleto" required class="w-100">
+        </div>
+
+        <div class="field col-12 mb-3">
+          <label for="email">Email *</label>
+          <input id="email" pInputText [(ngModel)]="nuevoUsuario.email" 
+                 name="email" type="email" required class="w-100">
+        </div>
+
+        <div class="field col-12 mb-3">
+          <label for="rol">Rol *</label>
+          <select class="form-select">
+          </select>
+        </div>
+
+        <div class="field col-12 mb-3">
+          <label for="password">Contraseña *</label>
+          <input id="password" pInputText [(ngModel)]="nuevoUsuario.password" 
+                 name="password" type="password" required minlength="6" class="w-100">
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" label="Cancelar" 
+                class="btn btn-primary" (click)="displayNuevoUsuario = false">
+        </button>
+        <button type="submit" label="Guardar" 
+                [disabled]="!usuarioForm.form.valid" >
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

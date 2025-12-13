@@ -1,0 +1,188 @@
+<div class="register-container">
+  <div class="register-card-wrapper">
+    <div class="register-card">
+      <!-- Header -->
+      <div class="register-header">
+        <div class="logo-circle">
+          <i class="bi bi-person-plus-fill"></i>
+        </div>
+        <h2 class="register-title">Crear Cuenta</h2>
+        <p class="register-subtitle">Sistema Judicial BCI</p>
+      </div>
+
+      <!-- Form -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+        <div class="row">
+          <!-- Usuario -->
+          <div class="col-12">
+            <div class="form-group">
+              <label for="usuario" class="form-label">
+                <i class="bi bi-person-circle me-2"></i>Usuario
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  type="text" 
+                  id="usuario"
+                  class="form-control"
+                  formControlName="usuario"
+                  placeholder="Ingrese su usuario"
+                  [class.is-invalid]="usuario?.invalid && (usuario?.dirty || usuario?.touched)">
+                <i class="bi bi-person input-icon"></i>
+              </div>
+              <div *ngIf="usuario?.invalid && (usuario?.dirty || usuario?.touched)" class="error-message">
+                <small *ngIf="usuario?.errors?.['required']">El usuario es requerido</small>
+                <small *ngIf="usuario?.errors?.['minlength']">Mínimo 3 caracteres</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nombre Completo -->
+          <div class="col-12">
+            <div class="form-group">
+              <label for="nombreCompleto" class="form-label">
+                <i class="bi bi-card-text me-2"></i>Nombre Completo
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  type="text" 
+                  id="nombreCompleto"
+                  class="form-control"
+                  formControlName="nombreCompleto"
+                  placeholder="Nombre y apellidos"
+                  [class.is-invalid]="nombreCompleto?.invalid && (nombreCompleto?.dirty || nombreCompleto?.touched)">
+                <i class="bi bi-card-text input-icon"></i>
+              </div>
+              <div *ngIf="nombreCompleto?.invalid && (nombreCompleto?.dirty || nombreCompleto?.touched)" class="error-message">
+                <small *ngIf="nombreCompleto?.errors?.['required']">El nombre completo es requerido</small>
+                <small *ngIf="nombreCompleto?.errors?.['minlength']">Mínimo 5 caracteres</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="col-12">
+            <div class="form-group">
+              <label for="email" class="form-label">
+                <i class="bi bi-envelope me-2"></i>Correo electrónico
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  type="email" 
+                  id="email"
+                  class="form-control"
+                  formControlName="email"
+                  placeholder="correo@ejemplo.com"
+                  [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)">
+                <i class="bi bi-envelope input-icon"></i>
+              </div>
+              <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="error-message">
+                <small *ngIf="email?.errors?.['required']">El correo es requerido</small>
+                <small *ngIf="email?.errors?.['email']">Correo inválido</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tipo de Usuario -->
+          <div class="col-12">
+            <div class="form-group">
+              <label for="rol" class="form-label">
+                <i class="bi bi-briefcase me-2"></i>Tipo de usuario
+              </label>
+              <div class="input-wrapper">
+                <select 
+                  id="rol"
+                  class="form-control form-select"
+                  formControlName="rol"
+                  [class.is-invalid]="rol?.invalid && (rol?.dirty || rol?.touched)">
+                  <option value="" disabled selected>Seleccione un tipo</option>
+                  <option value="ABOGADO">Abogado</option>
+                  <option value="USUARIO">Usuario</option>
+                </select>
+                <i class="bi bi-briefcase input-icon"></i>
+              </div>
+              <div *ngIf="rol?.invalid && (rol?.dirty || rol?.touched)" class="error-message">
+                <small *ngIf="rol?.errors?.['required']">El tipo de usuario es requerido</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="password" class="form-label">
+                <i class="bi bi-shield-lock me-2"></i>Contraseña
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  [type]="showPassword ? 'text' : 'password'" 
+                  id="password"
+                  class="form-control"
+                  formControlName="password"
+                  placeholder="Ingrese su contraseña"
+                  [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)">
+                <i class="bi bi-lock input-icon"></i>
+                <button 
+                  type="button" 
+                  class="toggle-password"
+                  (click)="togglePasswordVisibility('password')">
+                  <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+              </div>
+              <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="error-message">
+                <small *ngIf="password?.errors?.['required']">La contraseña es requerida</small>
+                <small *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirmar Contraseña -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="confirmPassword" class="form-label">
+                <i class="bi bi-shield-check me-2"></i>Confirmar Contraseña
+              </label>
+              <div class="input-wrapper">
+                <input 
+                  [type]="showConfirmPassword ? 'text' : 'password'" 
+                  id="confirmPassword"
+                  class="form-control"
+                  formControlName="confirmPassword"
+                  placeholder="Confirme su contraseña"
+                  [class.is-invalid]="(confirmPassword?.invalid || registerForm.errors?.['mismatch']) && (confirmPassword?.dirty || confirmPassword?.touched)">
+                <i class="bi bi-lock input-icon"></i>
+                <button 
+                  type="button" 
+                  class="toggle-password"
+                  (click)="togglePasswordVisibility('confirmPassword')">
+                  <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                </button>
+              </div>
+              <div *ngIf="registerForm.errors?.['mismatch'] && confirmPassword?.touched" class="error-message">
+                <small>Las contraseñas no coinciden</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón de submit -->
+        <button 
+          type="submit" 
+          class="btn-register"
+          [disabled]="registerForm.invalid || isLoading">
+          <span *ngIf="!isLoading">
+            <i class="bi bi-person-plus me-2"></i>Registrarse
+          </span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-2"></span>Registrando...
+          </span>
+        </button>
+
+        <!-- Link a login -->
+        <div class="login-link">
+          <span>¿Ya tienes una cuenta?</span>
+          <a routerLink="/auth/login">Iniciar sesión</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

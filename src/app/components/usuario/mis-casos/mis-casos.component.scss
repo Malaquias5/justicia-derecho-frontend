@@ -1,0 +1,21 @@
+.mis-casos-container {
+  padding: 20px 0;
+}
+
+.caso-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  
+  &.border-start {
+    border-left-width: 4px !important;
+  }
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
