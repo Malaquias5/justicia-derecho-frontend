@@ -63,6 +63,59 @@ export const routes: Routes = [
           ),
         title: 'Estadísticas',
       },
+      {
+        path: 'historial',
+        loadComponent: () =>
+          import('./components/admin/historial/historial.component').then(
+            (m) => m.HistorialComponent
+          ),
+        title: 'Historial de Cambios',
+      },
+      {
+        path: 'casos',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/abogado/casos/list/casos-list.component').then(
+                (m) => m.CasosListComponent
+              ),
+            title: 'Todos los Casos',
+          },
+          {
+            path: 'nuevo',
+            loadComponent: () =>
+              import('./components/abogado/casos/create/caso-create.component').then(
+                (m) => m.CasoCreateComponent
+              ),
+            title: 'Nuevo Caso',
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./components/abogado/casos/detail/caso-detail.component').then(
+                (m) => m.CasoDetailComponent
+              ),
+            title: 'Detalle del Caso',
+          },
+          {
+            path: 'editar/:id',
+            loadComponent: () =>
+              import('./components/abogado/casos/edit/caso-edit.component').then(
+                (m) => m.CasoEditComponent
+              ),
+            title: 'Editar Caso',
+          },
+        ],
+      },
+      {
+        path: 'documentos',
+        loadComponent: () =>
+          import('./components/abogado/documentos/documentos.component').then(
+            (m) => m.DocumentosComponent
+          ),
+        title: 'Documentos',
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
@@ -122,6 +175,30 @@ export const routes: Routes = [
           },
         ],
       },
+      {
+        path: 'calendario',
+        loadComponent: () =>
+          import('./components/abogado/calendario/calendario.component').then(
+            (m) => m.CalendarioComponent
+          ),
+        title: 'Calendario',
+      },
+      {
+        path: 'documentos',
+        loadComponent: () =>
+          import('./components/abogado/documentos/documentos.component').then(
+            (m) => m.DocumentosComponent
+          ),
+        title: 'Documentos',
+      },
+      {
+        path: 'seguimientos',
+        loadComponent: () =>
+          import('./components/abogado/seguimientos/seguimientos.component').then(
+            (m) => m.SeguimientosComponent
+          ),
+        title: 'Seguimientos',
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
@@ -142,6 +219,39 @@ export const routes: Routes = [
             (m) => m.MisCasosComponent
           ),
         title: 'Mis Casos',
+      },
+
+      {
+        path: 'seguimiento',
+        loadComponent: () =>
+          import('./components/usuario/seguimiento/seguimiento.component.js').then(
+            (m) => m.SeguimientoComponent
+          ),
+        title: 'Seguimiento',
+      },
+
+      {
+        path: 'configuracion',
+        loadComponent: () =>
+          import('./components/usuario/configuracion/configuracion.component.js').then(
+            (m) => m.ConfiguracionComponent
+          ),
+        title: 'Configuración',
+      },
+
+      {
+        path: 'ayuda',
+        loadComponent: () =>
+          import('./components/usuario/ayuda/ayuda.component.js').then((m) => m.AyudaComponent),
+        title: 'Ayuda',
+      },
+      {
+        path: 'documentos',
+        loadComponent: () =>
+          import('./components/abogado/documentos/documentos.component').then(
+            (m) => m.DocumentosComponent
+          ),
+        title: 'Documentos',
       },
       {
         path: 'caso/:id',

@@ -20,8 +20,8 @@
                 <i class="bi bi-person-circle me-2"></i>Usuario
               </label>
               <div class="input-wrapper">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="usuario"
                   class="form-control"
                   formControlName="usuario"
@@ -43,8 +43,8 @@
                 <i class="bi bi-card-text me-2"></i>Nombre Completo
               </label>
               <div class="input-wrapper">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   id="nombreCompleto"
                   class="form-control"
                   formControlName="nombreCompleto"
@@ -66,8 +66,8 @@
                 <i class="bi bi-envelope me-2"></i>Correo electrónico
               </label>
               <div class="input-wrapper">
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   id="email"
                   class="form-control"
                   formControlName="email"
@@ -89,14 +89,14 @@
                 <i class="bi bi-briefcase me-2"></i>Tipo de usuario
               </label>
               <div class="input-wrapper">
-                <select 
+                <select
                   id="rol"
                   class="form-control form-select"
                   formControlName="rol"
                   [class.is-invalid]="rol?.invalid && (rol?.dirty || rol?.touched)">
                   <option value="" disabled selected>Seleccione un tipo</option>
-                  <option value="ABOGADO">Abogado</option>
-                  <option value="USUARIO">Usuario</option>
+                  <option value="Abogado">Abogado</option>
+                  <option value="Usuario">Usuario</option>
                 </select>
                 <i class="bi bi-briefcase input-icon"></i>
               </div>
@@ -113,16 +113,16 @@
                 <i class="bi bi-shield-lock me-2"></i>Contraseña
               </label>
               <div class="input-wrapper">
-                <input 
-                  [type]="showPassword ? 'text' : 'password'" 
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
                   id="password"
                   class="form-control"
                   formControlName="password"
                   placeholder="Ingrese su contraseña"
                   [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)">
                 <i class="bi bi-lock input-icon"></i>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="toggle-password"
                   (click)="togglePasswordVisibility('password')">
                   <i [class]="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
@@ -142,16 +142,16 @@
                 <i class="bi bi-shield-check me-2"></i>Confirmar Contraseña
               </label>
               <div class="input-wrapper">
-                <input 
-                  [type]="showConfirmPassword ? 'text' : 'password'" 
+                <input
+                  [type]="showConfirmPassword ? 'text' : 'password'"
                   id="confirmPassword"
                   class="form-control"
                   formControlName="confirmPassword"
                   placeholder="Confirme su contraseña"
                   [class.is-invalid]="(confirmPassword?.invalid || registerForm.errors?.['mismatch']) && (confirmPassword?.dirty || confirmPassword?.touched)">
                 <i class="bi bi-lock input-icon"></i>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   class="toggle-password"
                   (click)="togglePasswordVisibility('confirmPassword')">
                   <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
@@ -165,8 +165,8 @@
         </div>
 
         <!-- Botón de submit -->
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           class="btn-register"
           [disabled]="registerForm.invalid || isLoading">
           <span *ngIf="!isLoading">

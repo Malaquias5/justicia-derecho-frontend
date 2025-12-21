@@ -10,28 +10,25 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-caso-create',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './caso-create.component.html',
-  styleUrls: ['./caso-create.component.scss']
+  styleUrls: ['./caso-create.component.scss'],
 })
 export class CasoCreateComponent implements OnInit {
   casoForm: FormGroup;
   isLoading = false;
   today = new Date();
-  
+
   tiposCaso = environment.tiposCaso;
   dependencias = environment.dependencias;
   estados = environment.estadosCaso;
 
   constructor(
-    private fb: FormBuilder,
-    private casosService: CasosService,
-    private authService: AuthService,
-    private router: Router,
-    private toastr: ToastrService
+    private readonly fb: FormBuilder,
+    private readonly casosService: CasosService,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly toastr: ToastrService
   ) {
     this.casoForm = this.fb.group({
       numeroCaso: ['', Validators.required],
@@ -42,7 +39,7 @@ export class CasoCreateComponent implements OnInit {
       tipoCaso: ['', Validators.required],
       dependencia: ['', Validators.required],
       opcionLlenado: [''],
-      estado: ['Pendiente', Validators.required]
+      estado: ['Pendiente', Validators.required],
     });
   }
 
@@ -51,7 +48,7 @@ export class CasoCreateComponent implements OnInit {
     const user = this.authService.getUser();
     if (user) {
       this.casoForm.patchValue({
-        abogado: user.nombreCompleto
+        abogado: user.nombreCompleto,
       });
     }
   }
@@ -64,14 +61,21 @@ export class CasoCreateComponent implements OnInit {
     }
 
     this.isLoading = true;
-    const casoData = this.casoForm.value;
+    const casoData = { ...this.casoForm.value };
 
-    // Formatear fechas
-    casoData.fechaIngreso = this.formatDate(casoData.fechaIngreso);
-    casoData.fechaVencimiento = this.formatDate(casoData.fechaVencimiento);
+    // Formatear fechas si es necesario
+    if (casoData.fechaIngreso) {
+      casoData.fechaIngreso = this.formatDate(casoData.fechaIngreso);
+    }
+    if (casoData.fechaVencimiento) {
+      casoData.fechaVencimiento = this.formatDate(casoData.fechaVencimiento);
+    }
+
+    console.log('Enviando caso:', casoData); // Para debug
 
     this.casosService.crearCaso(casoData).subscribe({
       next: (response) => {
+        this.isLoading = false;
         this.toastr.success('Caso creado exitosamente', 'Éxito');
         this.router.navigate(['/abogado/casos']);
       },
@@ -79,17 +83,25 @@ export class CasoCreateComponent implements OnInit {
         this.isLoading = false;
         const errorMessage = error.error?.message || 'Error al crear caso';
         this.toastr.error(errorMessage, 'Error');
+        console.error('Error al crear caso:', error);
       },
-      complete: () => {
-        this.isLoading = false;
-      }
     });
   }
 
-  private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+  private formatDate(date: any): string {
+    // Si ya es un string en formato correcto, devolverlo tal cual
+    if (typeof date === 'string') {
+      return date;
+    }
+    // Si es un objeto Date, formatearlo
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0];
+    }
+    return date;
   }
 
   // Getters
-  get numeroCaso() { return this.casoForm.get('numeroCaso'); }
+  get numeroCaso() {
+    return this.casoForm.get('numeroCaso');
+  }
 }

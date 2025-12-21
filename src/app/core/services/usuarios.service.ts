@@ -6,11 +6,11 @@ import { Usuario, UsuarioRequest } from '../models/usuario.model';
 import { ApiResponse } from '../models/api-response.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsuariosService {
-  private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/admin/usuarios`;
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/admin/usuarios`;
 
   listarUsuarios(): Observable<ApiResponse<Usuario[]>> {
     return this.http.get<ApiResponse<Usuario[]>>(this.apiUrl);

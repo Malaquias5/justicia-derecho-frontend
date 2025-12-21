@@ -1,27 +1,32 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common'; // Importante para detectar el navegador
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '../../environments/environment';
 import { LoginRequest, LoginResponse, AuthResponse, UsuarioRequest } from '../models/usuario.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private apiUrl = environment.apiUrl;
-  
-  private currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID); // Inyectamos el ID de la plataforma
+  private readonly apiUrl = environment.apiUrl;
+
+  private readonly currentUserSubject = new BehaviorSubject<LoginResponse | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
-  
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+
+  private readonly isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor() {
-    this.loadToken();
+    // Solo cargamos el token si estamos en el navegador para evitar el error de localStorage
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadToken();
+    }
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
@@ -29,88 +34,86 @@ export class AuthService {
     if (environment.mockMode) {
       return this.mockLogin(credentials);
     }
-    
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => {
-          if (response.success && response.data.token) {
-            this.saveToken(response.data.token);
-            this.currentUserSubject.next(response.data);
-            this.isAuthenticatedSubject.next(true);
-          }
-        })
-      );
+
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
+      tap((response) => {
+        if (response.success && response.data.token) {
+          this.saveToken(response.data.token);
+          this.currentUserSubject.next(response.data);
+          this.isAuthenticatedSubject.next(true);
+        }
+      })
+    );
   }
 
   private mockLogin(credentials: LoginRequest): Observable<AuthResponse> {
-    // Usuarios de prueba
     const mockUsers: Record<string, { password: string; data: LoginResponse }> = {
-      'admin': {
+      admin: {
         password: 'admin123',
         data: {
           token: 'mock-token-admin',
           usuario: 'admin',
           nombreCompleto: 'Administrador Sistema',
           email: 'admin@bci.com',
-          rol: 'Admin'
-        }
+          rol: 'Admin',
+        },
       },
-      'abogado1': {
+      abogado1: {
         password: 'abogado123',
         data: {
           token: 'mock-token-abogado1',
           usuario: 'abogado1',
           nombreCompleto: 'Juan Pérez',
           email: 'juan.perez@bci.com',
-          rol: 'Abogado'
-        }
+          rol: 'Abogado',
+        },
       },
-      'abogado2': {
+      abogado2: {
         password: 'abogado123',
         data: {
           token: 'mock-token-abogado2',
           usuario: 'abogado2',
           nombreCompleto: 'María González',
           email: 'maria.gonzalez@bci.com',
-          rol: 'Abogado'
-        }
+          rol: 'Abogado',
+        },
       },
-      'usuario1': {
+      usuario1: {
         password: 'usuario123',
         data: {
           token: 'mock-token-usuario1',
           usuario: 'usuario1',
           nombreCompleto: 'Carlos Rodríguez',
           email: 'carlos.rodriguez@mail.com',
-          rol: 'Usuario'
-        }
-      }
+          rol: 'Usuario',
+        },
+      },
     };
 
-    return new Observable(observer => {
+    return new Observable((observer) => {
       setTimeout(() => {
         const user = mockUsers[credentials.usuario];
-        
+
         if (!user || user.password !== credentials.password) {
           observer.error({
-            error: { message: 'Usuario o contraseña incorrectos' }
+            error: { message: 'Usuario o contraseña incorrectos' },
           });
         } else {
           const response: AuthResponse = {
             success: true,
             message: 'Login exitoso',
             data: user.data,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           };
-          
+
           this.saveToken(user.data.token);
           this.currentUserSubject.next(user.data);
           this.isAuthenticatedSubject.next(true);
-          
+
           observer.next(response);
           observer.complete();
         }
-      }, 1000); // Simular latencia de red
+      }, 1000);
     });
   }
 
@@ -121,16 +124,26 @@ export class AuthService {
   logout(): void {
     const token = this.getToken();
     if (token) {
-      this.http.post(`${this.apiUrl}/auth/logout`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      }).subscribe();
+      this.http
+        .post(
+          `${this.apiUrl}/auth/logout`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+        .subscribe();
     }
     this.clearAuth();
     this.router.navigate(['/auth/login']);
   }
 
+  // Verifica si está en el navegador antes de acceder a localStorage
   getToken(): string | null {
-    return localStorage.getItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
 
   getUser(): LoginResponse | null {
@@ -157,23 +170,29 @@ export class AuthService {
     const token = this.getToken();
     if (token && this.isTokenValid(token)) {
       const decoded = this.decodeToken(token);
-      this.currentUserSubject.next({
-        token,
-        usuario: decoded.sub,
-        nombreCompleto: decoded.nombreCompleto || '',
-        email: decoded.email || '',
-        rol: decoded.role
-      });
-      this.isAuthenticatedSubject.next(true);
+      if (decoded) {
+        this.currentUserSubject.next({
+          token,
+          usuario: decoded.sub || '',
+          nombreCompleto: decoded.nombreCompleto || '',
+          email: decoded.email || '',
+          rol: decoded.role || '',
+        });
+        this.isAuthenticatedSubject.next(true);
+      }
     }
   }
 
   private saveToken(token: string): void {
-    localStorage.setItem('token', token);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('token', token);
+    }
   }
 
   private clearAuth(): void {
-    localStorage.removeItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+    }
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }

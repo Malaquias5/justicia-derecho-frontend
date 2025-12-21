@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
-
+/* Ngx Toastr */
+@use 'ngx-toastr/toastr';
 /* Bootstrap */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -9,8 +10,7 @@
 /* FontAwesome */
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 
-/* Ngx Toastr */
-@import 'ngx-toastr/toastr';
+
 
 /* Global Styles */
 * {

@@ -5,9 +5,8 @@
       <h2 class="h4 mb-2">Gestión de Usuarios</h2>
       <p class="text-muted mb-0">Administra los usuarios del sistema</p>
     </div>
-    <button label="Nuevo Usuario" 
-       
-      (click)="showNuevoUsuarioDialog()">
+    <button class="btn btn-success" (click)="showNuevoUsuarioDialog()">
+      <i class="bi bi-plus-circle me-2"></i>Nuevo Usuario
     </button>
   </div>
 
@@ -44,7 +43,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let usuario of usuariosFiltrados">
+          <tr *ngFor="let usuario of usuariosPaginados">
             <td>{{ usuario.idUsuario }}</td>
             <td class="fw-semibold">{{ usuario.usuario }}</td>
             <td>{{ usuario.nombreCompleto }}</td>
@@ -82,52 +81,104 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Paginación -->
+      <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="usuariosFiltrados.length > 0">
+        <div class="text-muted">
+          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} - 
+          {{ Math.min(currentPage * itemsPerPage, usuariosFiltrados.length) }} de {{ usuariosFiltrados.length }} usuarios
+        </div>
+        <nav>
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button type="button" class="page-link" (click)="cambiarPagina(currentPage - 1)">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+            </li>
+            <li class="page-item" *ngFor="let p of paginasArray" [class.active]="p === currentPage">
+              <button type="button" class="page-link" (click)="cambiarPagina(p)">{{ p }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button type="button" class="page-link" (click)="cambiarPagina(currentPage + 1)">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
 
-  <!-- Diálogo nuevo usuario -->
-  <div class="modal">
-    <form (ngSubmit)="guardarUsuario()" #usuarioForm="ngForm">
-      <div class="p-fluid grid">
-        <div class="field col-12 mb-3">
-          <label for="usuario">Usuario *</label>
-          <input id="usuario" pInputText [(ngModel)]="nuevoUsuario.usuario" 
-                 name="usuario" required minlength="3" class="w-100">
+  <!-- Modal Nuevo Usuario (Bootstrap) -->
+  <div class="modal fade" [class.show]="displayNuevoUsuario" [style.display]="displayNuevoUsuario ? 'block' : 'none'" 
+       tabindex="-1" role="dialog" *ngIf="displayNuevoUsuario">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
+          </h5>
+          <button type="button" class="btn-close" (click)="displayNuevoUsuario = false"></button>
         </div>
+        <form (ngSubmit)="guardarUsuario()" #usuarioForm="ngForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="usuario" class="form-label">Usuario *</label>
+              <input type="text" id="usuario" class="form-control" 
+                     [(ngModel)]="nuevoUsuario.usuario" 
+                     name="usuario" required minlength="3"
+                     placeholder="Ej: jperez">
+              <small class="text-muted">Mínimo 3 caracteres</small>
+            </div>
 
-        <div class="field col-12 mb-3">
-          <label for="nombreCompleto">Nombre Completo *</label>
-          <input id="nombreCompleto" pInputText [(ngModel)]="nuevoUsuario.nombreCompleto" 
-                 name="nombreCompleto" required class="w-100">
-        </div>
+            <div class="mb-3">
+              <label for="nombreCompleto" class="form-label">Nombre Completo *</label>
+              <input type="text" id="nombreCompleto" class="form-control" 
+                     [(ngModel)]="nuevoUsuario.nombreCompleto" 
+                     name="nombreCompleto" required
+                     placeholder="Ej: Juan Pérez">
+            </div>
 
-        <div class="field col-12 mb-3">
-          <label for="email">Email *</label>
-          <input id="email" pInputText [(ngModel)]="nuevoUsuario.email" 
-                 name="email" type="email" required class="w-100">
-        </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email *</label>
+              <input type="email" id="email" class="form-control" 
+                     [(ngModel)]="nuevoUsuario.email" 
+                     name="email" required
+                     placeholder="ejemplo@correo.com">
+            </div>
 
-        <div class="field col-12 mb-3">
-          <label for="rol">Rol *</label>
-          <select class="form-select">
-          </select>
-        </div>
+            <div class="mb-3">
+              <label for="rol" class="form-label">Rol *</label>
+              <select id="rol" class="form-select" [(ngModel)]="nuevoUsuario.rol" name="rol" required>
+                <option value="Admin">Administrador</option>
+                <option value="Abogado">Abogado</option>
+                <option value="Usuario">Usuario</option>
+              </select>
+            </div>
 
-        <div class="field col-12 mb-3">
-          <label for="password">Contraseña *</label>
-          <input id="password" pInputText [(ngModel)]="nuevoUsuario.password" 
-                 name="password" type="password" required minlength="6" class="w-100">
-        </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña *</label>
+              <input type="password" id="password" class="form-control" 
+                     [(ngModel)]="nuevoUsuario.password" 
+                     name="password" required minlength="6"
+                     placeholder="Mínimo 6 caracteres">
+              <small class="text-muted">La contraseña debe tener al menos 6 caracteres</small>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="displayNuevoUsuario = false">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </button>
+            <button type="submit" class="btn btn-success" [disabled]="!usuarioForm.form.valid">
+              <i class="bi bi-check-circle me-2"></i>Guardar Usuario
+            </button>
+          </div>
+        </form>
       </div>
-
-      <div class="d-flex justify-content-end gap-2 mt-4">
-        <button type="button" label="Cancelar" 
-                class="btn btn-primary" (click)="displayNuevoUsuario = false">
-        </button>
-        <button type="submit" label="Guardar" 
-                [disabled]="!usuarioForm.form.valid" >
-        </button>
-      </div>
-    </form>
+    </div>
   </div>
+  
+  <!-- Backdrop del modal -->
+  <div class="modal-backdrop fade show" *ngIf="displayNuevoUsuario" (click)="displayNuevoUsuario = false"></div>
 </div>

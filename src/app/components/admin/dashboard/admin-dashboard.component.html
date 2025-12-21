@@ -7,31 +7,119 @@
 
   <!-- Estadísticas rápidas -->
   <div class="row mb-4">
-    <div class="col-md-3 mb-3" *ngFor="let stat of stats">
-      <div class="card">
-        <h2 class="display-6 fw-bold" [ngClass]="stat.colorClass">{{ stat.value }}</h2>
-        <p class="text-muted small">{{ stat.description }}</p>
+    <div class="col-md-3 mb-3">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="display-6 fw-bold text-primary mb-1">{{ stats[0]?.value || '0' }}</h2>
+              <p class="text-muted mb-0 small">{{ stats[0]?.description }}</p>
+            </div>
+            <i class="bi bi-folder-fill text-primary" style="font-size: 3rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="display-6 fw-bold text-success mb-1">{{ stats[1]?.value || '0' }}</h2>
+              <p class="text-muted mb-0 small">{{ stats[1]?.description }}</p>
+            </div>
+            <i class="bi bi-people-fill text-success" style="font-size: 3rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="display-6 fw-bold text-warning mb-1">{{ stats[2]?.value || '0' }}</h2>
+              <p class="text-muted mb-0 small">{{ stats[2]?.description }}</p>
+            </div>
+            <i class="bi bi-clock-fill text-warning" style="font-size: 3rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="display-6 fw-bold text-info mb-1">{{ stats[3]?.value || '0' }}</h2>
+              <p class="text-muted mb-0 small">{{ stats[3]?.description }}</p>
+            </div>
+            <i class="bi bi-check-circle-fill text-info" style="font-size: 3rem; opacity: 0.2;"></i>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Gráficos -->
+  <!-- Botones de Acción Rápida -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-primary" routerLink="/admin/casos/nuevo">
+          <i class="bi bi-plus-circle me-2"></i>Nuevo Caso
+        </button>
+        <button class="btn btn-success" routerLink="/admin/usuarios/nuevo">
+          <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
+        </button>
+        <button class="btn btn-info" routerLink="/admin/estadisticas">
+          <i class="bi bi-bar-chart me-2"></i>Ver Reportes
+        </button>
+        <button class="btn btn-outline-secondary" (click)="exportarDatos()">
+          <i class="bi bi-download me-2"></i>Exportar Datos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficos y Actividad Reciente -->
   <div class="row mb-4">
     <div class="col-md-8 mb-3">
-      <div class="card">
-        <canvas></canvas>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-pie-chart me-2 text-primary"></i>Distribución de Casos por Estado
+          </h5>
+        </div>
+        <div class="card-body">
+          <canvas #chartCanvas id="casosChart" height="80"></canvas>
+        </div>
       </div>
     </div>
     <div class="col-md-4 mb-3">
-      <div class="card">
-        <div *ngFor="let activity of recentActivity" class="activity-item mb-3">
-          <div class="d-flex align-items-center">
-            <i [class]="activity.icon" class="me-2" [ngClass]="activity.iconClass"></i>
-            <div>
-              <div class="fw-semibold">{{ activity.title }}</div>
-              <div class="text-muted small">{{ activity.description }}</div>
-              <div class="text-muted small">{{ activity.time }}</div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-clock-history me-2 text-primary"></i>Actividad Reciente
+          </h5>
+        </div>
+        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+          <div *ngFor="let activity of recentActivity; let last = last" class="activity-item mb-3" [class.pb-3]="!last" [class.border-bottom]="!last">
+            <div class="d-flex align-items-start">
+              <div class="rounded-circle p-2 me-3" [ngClass]="activity.bgClass" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <i [class]="activity.icon" [ngClass]="activity.iconClass" style="font-size: 1.2rem;"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold small">{{ activity.title }}</div>
+                <div class="text-muted" style="font-size: 0.85rem;">{{ activity.description }}</div>
+                <div class="text-muted" style="font-size: 0.75rem;">
+                  <i class="bi bi-clock me-1"></i>{{ activity.time }}
+                </div>
+              </div>
             </div>
+          </div>
+          <div *ngIf="recentActivity.length === 0" class="text-center text-muted py-4">
+            <i class="bi bi-clock-history" style="font-size: 2rem; opacity: 0.3;"></i>
+            <p class="mt-2 mb-0">No hay actividad reciente</p>
           </div>
         </div>
       </div>
@@ -41,53 +129,62 @@
   <!-- Tabla de casos urgentes -->
   <div class="row">
     <div class="col-12">
-      <div class="card">
-        <table class="table">
-          <ng-template>
-            <tr>
-              <th>N° Caso</th>
-              <th>Abogado</th>
-              <th>Patrocinado</th>
-              <th>Vencimiento</th>
-              <th>Días Restantes</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-caso>
-            <tr>
-              <td class="fw-bold">{{ caso.numeroCaso }}</td>
-              <td>{{ caso.abogado }}</td>
-              <td>{{ caso.patrocinado }}</td>
-              <td>{{ caso.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
-              <td>
-                <span [ngClass]="{
-                  'text-danger': caso.diasRestantes <= 3,
-                  'text-warning': caso.diasRestantes > 3 && caso.diasRestantes <= 7,
-                  'text-success': caso.diasRestantes > 7
-                }">
-                  {{ caso.diasRestantes }} días
-                </span>
-              </td>
-              <td>
-                <span class="badge" [ngClass]="getEstadoClass(caso.estado)">{{ caso.estado }}</span>
-              </td>
-              <td>
-                <button type="button" class="btn btn-sm btn-outline-primary" title="Ver detalles">
-                  <i class="bi bi-eye"></i>
-                </button>
-              </td>
-            </tr>
-          </ng-template>
-          <ng-template>
-            <tr>
-              <td colspan="7" class="text-center py-4">
-                <i class="pi pi-info-circle me-2"></i>
-                No hay casos urgentes
-              </td>
-            </tr>
-          </ng-template>
-        </table>
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-exclamation-triangle me-2 text-danger"></i>Casos Próximos a Vencer
+          </h5>
+          <a routerLink="/admin/casos" class="btn btn-sm btn-primary">
+            <i class="bi bi-arrow-right-circle me-1"></i>Ver todos
+          </a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>N° Caso</th>
+                <th>Abogado</th>
+                <th>Patrocinado</th>
+                <th>Vencimiento</th>
+                <th>Días Restantes</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let caso of casosUrgentes">
+                <td class="fw-bold">{{ caso.numeroCaso }}</td>
+                <td>{{ caso.abogado }}</td>
+                <td>{{ caso.patrocinado }}</td>
+                <td>{{ caso.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="{
+                    'bg-danger': caso.diasRestantes <= 3,
+                    'bg-warning text-dark': caso.diasRestantes > 3 && caso.diasRestantes <= 7
+                  }">
+                    {{ caso.diasRestantes }} días
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getEstadoClass(caso.estado)">{{ caso.estado }}</span>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-outline-primary" 
+                          [routerLink]="['/admin/casos', caso.idRegistro]"
+                          title="Ver detalles">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="casosUrgentes.length === 0">
+                <td colspan="7" class="text-center py-4">
+                  <i class="bi bi-check-circle text-success me-2"></i>
+                  No hay casos urgentes
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

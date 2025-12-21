@@ -1,21 +1,77 @@
 .admin-dashboard {
   padding: 20px 0;
+  
+  .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+  }
+
+  .shadow-sm {
+    box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.075) !important;
+  }
+
+  // Animación para las tarjetas de stats
+  .col-md-3 .card {
+    animation: fadeInUp 0.5s ease-out;
+    
+    @for $i from 1 through 4 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.1}s;
+      }
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 .activity-item {
-  padding: 10px;
-  border-left: 3px solid #4c6ef5;
-  background-color: #f8f9fa;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #f8f9fa;
+  }
+
+  .rounded-circle {
+    transition: transform 0.2s;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
 }
 
-.text-success {
-  color: #28a745 !important;
+.table-hover tbody tr {
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: rgba(13, 110, 253, 0.05) !important;
+  }
 }
 
-.text-warning {
-  color: #ffc107 !important;
+// Estilos para los botones de acción rápida
+.btn {
+  transition: all 0.2s;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
 }
 
-.text-danger {
-  color: #dc3545 !important;
+// Estilos para el canvas del gráfico
+#casosChart {
+  max-height: 300px;
 }

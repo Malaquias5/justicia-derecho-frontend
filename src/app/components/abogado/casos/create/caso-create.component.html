@@ -11,9 +11,9 @@
       <div class="row g-3">
         <!-- Información básica -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Número de Caso *</label>
-          <input pInputText formControlName="numeroCaso" 
-                 placeholder="Ej: CASO-2024-0001" class="w-100">
+          <label for="numeroCaso" class="form-label fw-semibold">Número de Caso *</label>
+          <input type="text" id="numeroCaso" class="form-control" formControlName="numeroCaso" 
+                 placeholder="Ej: CASO-2024-0001">
           <div *ngIf="numeroCaso?.invalid && (numeroCaso?.dirty || numeroCaso?.touched)" 
                class="invalid-feedback d-block">
             <small *ngIf="numeroCaso?.errors?.['required']">Este campo es requerido</small>
@@ -21,54 +21,59 @@
         </div>
 
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Tipo de Caso *</label>
-          <select class="form-select">
+          <label for="tipoCaso" class="form-label fw-semibold">Tipo de Caso *</label>
+          <select id="tipoCaso" class="form-select" formControlName="tipoCaso">
+            <option value="">Seleccione un tipo de caso</option>
+            <option *ngFor="let tipo of tiposCaso" [value]="tipo">{{ tipo }}</option>
           </select>
         </div>
 
         <!-- Abogado y Patrocinado -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Abogado *</label>
-          <input pInputText formControlName="abogado" 
-                 placeholder="Nombre del abogado" class="w-100">
+          <label for="abogado" class="form-label fw-semibold">Abogado *</label>
+          <input type="text" id="abogado" class="form-control" formControlName="abogado" 
+                 placeholder="Nombre del abogado">
         </div>
 
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Patrocinado *</label>
-          <input pInputText formControlName="patrocinado" 
-                 placeholder="Nombre del cliente" class="w-100">
+          <label for="patrocinado" class="form-label fw-semibold">Patrocinado *</label>
+          <input type="text" id="patrocinado" class="form-control" formControlName="patrocinado" 
+                 placeholder="Nombre del cliente">
         </div>
 
         <!-- Fechas -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Fecha de Ingreso *</label>
-          <input type="date" class="form-control" formControlName="fechaIngreso">
+          <label for="fechaIngreso" class="form-label fw-semibold">Fecha de Ingreso *</label>
+          <input type="date" id="fechaIngreso" class="form-control" formControlName="fechaIngreso">
         </div>
 
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Fecha de Vencimiento *</label>
-          <input type="date" class="form-control" formControlName="fechaVencimiento">
+          <label for="fechaVencimiento" class="form-label fw-semibold">Fecha de Vencimiento *</label>
+          <input type="date" id="fechaVencimiento" class="form-control" formControlName="fechaVencimiento">
         </div>
 
         <!-- Dependencia y Estado -->
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Dependencia *</label>
-          <select class="form-select">
+          <label for="dependencia" class="form-label fw-semibold">Dependencia *</label>
+          <select id="dependencia" class="form-select" formControlName="dependencia">
+            <option value="">Seleccione una dependencia</option>
+            <option *ngFor="let dep of dependencias" [value]="dep">{{ dep }}</option>
           </select>
         </div>
 
         <div class="col-md-6">
-          <label class="form-label fw-semibold">Estado *</label>
-          <select class="form-select">
+          <label for="estado" class="form-label fw-semibold">Estado *</label>
+          <select id="estado" class="form-select" formControlName="estado">
+            <option value="">Seleccione un estado</option>
+            <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
           </select>
         </div>
 
         <!-- Descripción -->
         <div class="col-12">
-          <label class="form-label fw-semibold">Descripción / Opción de Llenado</label>
-          <textarea pInputTextarea formControlName="opcionLlenado" 
-                    [rows]="4" placeholder="Describa el caso..." 
-                    class="w-100"></textarea>
+          <label for="opcionLlenado" class="form-label fw-semibold">Descripción / Opción de Llenado</label>
+          <textarea id="opcionLlenado" class="form-control" formControlName="opcionLlenado" 
+                    rows="4" placeholder="Describa el caso..."></textarea>
           <div class="form-text">
             Describa los detalles del caso, hechos relevantes y cualquier información importante.
           </div>
@@ -77,18 +82,23 @@
         <!-- Botones -->
         <div class="col-12">
           <div class="d-flex justify-content-end gap-3 mt-4">
-            <button type="button" label="Cancelar" 
-                    class="btn btn-primary" 
+            <button type="button" class="btn btn-secondary" 
                     routerLink="/abogado/casos">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
             </button>
-            <button type="submit" label="Guardar Caso" 
-                    [disabled]="casoForm.invalid || isLoading" 
-                     >
+            <button type="submit" class="btn btn-primary" 
+                    [disabled]="casoForm.invalid || isLoading">
+              <i class="bi bi-save me-2"></i>
+              <span *ngIf="!isLoading">Guardar Caso</span>
+              <span *ngIf="isLoading">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Guardando...
+              </span>
             </button>
           </div>
         </div>
       </div>
-    </form>
+    </form>bi b
   </div>
 
   <!-- Información adicional -->

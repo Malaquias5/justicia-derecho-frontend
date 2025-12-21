@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -10,32 +10,38 @@ import { AuthService } from '../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './abogado-dashboard.component.html',
-  styleUrls: ['./abogado-dashboard.component.scss']
+  styleUrls: ['./abogado-dashboard.component.scss'],
 })
 export class AbogadoDashboardComponent implements OnInit {
   user: any = null;
   casos: any[] = [];
   casosUrgentes: any[] = [];
-  
+
   totalCasos = 0;
   casosPendientes = 0;
   casosEnProceso = 0;
   casosFinalizados = 0;
   pendientesUrgentes = 0;
-  
+
+  // Paginación
+  currentPage = 1;
+  itemsPerPage = 5;
+  totalPages = 0;
+
   chartData: any;
   chartOptions = {
     plugins: {
       legend: {
-        position: 'bottom'
-      }
-    }
+        position: 'bottom',
+      },
+    },
   };
 
   constructor(
     private authService: AuthService,
     private casosService: CasosService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private cd: ChangeDetectorRef // 2. Inyéctalo aquí
   ) {}
 
   ngOnInit(): void {
@@ -47,32 +53,37 @@ export class AbogadoDashboardComponent implements OnInit {
     this.casosService.listarCasos().subscribe({
       next: (response) => {
         if (response.success) {
-          this.casos = response.data;
-          this.calcularEstadisticas();
-          this.filtrarCasosUrgentes();
-          this.actualizarChart();
+          setTimeout(() => {
+            this.casos = response.data;
+            this.calcularEstadisticas();
+            this.filtrarCasosUrgentes();
+            this.actualizarChart();
+
+            // 3. Agrega esto para avisar a Angular que los datos cambiaron
+            this.cd.detectChanges();
+          }, 0);
         }
       },
       error: (error) => {
         this.toastr.error('Error al cargar casos', 'Error');
-      }
+      },
     });
   }
 
   calcularEstadisticas(): void {
     this.totalCasos = this.casos.length;
-    this.casosPendientes = this.casos.filter(c => c.estado === 'Pendiente').length;
-    this.casosEnProceso = this.casos.filter(c => c.estado === 'En Proceso').length;
-    this.casosFinalizados = this.casos.filter(c => c.estado === 'Finalizado').length;
-    this.pendientesUrgentes = this.casos.filter(c => 
-      c.estado === 'Pendiente' && c.diasRestantes <= 7
+    this.casosPendientes = this.casos.filter((c) => c.estado === 'Pendiente').length;
+    this.casosEnProceso = this.casos.filter((c) => c.estado === 'En Proceso').length;
+    this.casosFinalizados = this.casos.filter((c) => c.estado === 'Finalizado').length;
+    this.pendientesUrgentes = this.casos.filter(
+      (c) => c.estado === 'Pendiente' && c.diasRestantes <= 7
     ).length;
   }
 
   filtrarCasosUrgentes(): void {
-    this.casosUrgentes = this.casos.filter(c => 
-      c.diasRestantes <= 14 && c.estado !== 'Finalizado'
-    ).sort((a, b) => a.diasRestantes - b.diasRestantes);
+    this.casosUrgentes = this.casos
+      .filter((c) => c.diasRestantes <= 14 && c.estado !== 'Finalizado')
+      .sort((a, b) => a.diasRestantes - b.diasRestantes);
   }
 
   actualizarChart(): void {
@@ -82,9 +93,9 @@ export class AbogadoDashboardComponent implements OnInit {
         {
           data: [this.casosPendientes, this.casosEnProceso, this.casosFinalizados],
           backgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0'],
-          hoverBackgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0']
-        }
-      ]
+          hoverBackgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0'],
+        },
+      ],
     };
   }
 
@@ -92,5 +103,20 @@ export class AbogadoDashboardComponent implements OnInit {
     if (dias <= 3) return 'danger';
     if (dias <= 7) return 'warn';
     return 'info';
+  }
+
+  getEstadoClass(estado: string): string {
+    switch (estado) {
+      case 'Pendiente':
+        return 'bg-warning text-dark';
+      case 'En Proceso':
+        return 'bg-info';
+      case 'Finalizado':
+        return 'bg-success';
+      case 'Archivado':
+        return 'bg-secondary';
+      default:
+        return 'bg-secondary';
+    }
   }
 }

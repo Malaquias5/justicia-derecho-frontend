@@ -42,6 +42,7 @@ export class LoginComponent implements OnInit {
   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+      this.toastr.warning('Complete todos los campos correctamente', 'Validación');
       return;
     }
 
@@ -50,17 +51,26 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
+        this.isLoading = false;
         this.toastr.success('Inicio de sesión exitoso', 'Bienvenido');
         this.redirectToDashboard();
       },
       error: (error) => {
         this.isLoading = false;
-        const errorMessage = error.error?.message || 'Error al iniciar sesión';
+        let errorMessage = 'Error al iniciar sesión';
+
+        // Manejo específico de errores
+        if (error.status === 401) {
+          errorMessage = 'Usuario o contraseña incorrectos';
+        } else if (error.status === 403) {
+          errorMessage = 'Cuenta inactiva. Contacte al administrador';
+        } else if (error.error?.message) {
+          errorMessage = error.error.message;
+        }
+
         this.toastr.error(errorMessage, 'Error');
+        console.error('Error de login:', error);
       },
-      complete: () => {
-        this.isLoading = false;
-      }
     });
   }
 

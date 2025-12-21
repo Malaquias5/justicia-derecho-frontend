@@ -35,6 +35,7 @@ export class CasoEditComponent implements OnInit {
     private toastr: ToastrService
   ) {
     this.casoForm = this.fb.group({
+      numeroCaso: [''],
       abogado: ['', Validators.required],
       patrocinado: ['', Validators.required],
       fechaIngreso: [null],
@@ -69,44 +70,56 @@ export class CasoEditComponent implements OnInit {
   }
 
   cargarFormulario(): void {
+    // Formatear fechas para input[type="date"] (YYYY-MM-DD)
+    const fechaIngreso = this.caso.fechaIngreso
+      ? new Date(this.caso.fechaIngreso).toISOString().split('T')[0]
+      : null;
+    const fechaVencimiento = this.caso.fechaVencimiento
+      ? new Date(this.caso.fechaVencimiento).toISOString().split('T')[0]
+      : null;
+
     this.casoForm.patchValue({
-      abogado: this.caso.abogado,
-      patrocinado: this.caso.patrocinado,
-      fechaIngreso: new Date(this.caso.fechaIngreso),
-      fechaVencimiento: new Date(this.caso.fechaVencimiento),
-      tipoCaso: this.caso.tipoCaso,
-      dependencia: this.caso.dependencia,
-      opcionLlenado: this.caso.opcionLlenado,
-      estado: this.caso.estado
+      numeroCaso: this.caso.numeroCaso || '',
+      abogado: this.caso.abogado || '',
+      patrocinado: this.caso.patrocinado || '',
+      fechaIngreso: fechaIngreso,
+      fechaVencimiento: fechaVencimiento,
+      tipoCaso: this.caso.tipoCaso || '',
+      dependencia: this.caso.dependencia || '',
+      opcionLlenado: this.caso.opcionLlenado || '',
+      estado: this.caso.estado || '',
     });
+
+    console.log('Formulario cargado con datos:', this.casoForm.value);
   }
 
   onSubmit(): void {
     if (this.casoForm.invalid) {
       this.casoForm.markAllAsTouched();
+      this.toastr.warning('Por favor complete todos los campos requeridos', 'Formulario incompleto');
       return;
     }
 
     this.isLoading = true;
-    const casoData = this.casoForm.value;
+    const casoData = { ...this.casoForm.value };
 
-    // Formatear fechas
-    casoData.fechaIngreso = this.formatDate(casoData.fechaIngreso);
-    casoData.fechaVencimiento = this.formatDate(casoData.fechaVencimiento);
+    // Las fechas ya vienen en formato YYYY-MM-DD del input[type="date"]
+    // No necesitamos formatearlas nuevamente
+
+    console.log('Enviando datos:', casoData);
 
     this.casosService.actualizarCaso(this.id, casoData).subscribe({
       next: (response) => {
+        this.isLoading = false;
         this.toastr.success('Caso actualizado exitosamente', 'Éxito');
         this.router.navigate(['/abogado/casos', this.id]);
       },
       error: (error) => {
         this.isLoading = false;
+        console.error('Error al actualizar:', error);
         const errorMessage = error.error?.message || 'Error al actualizar caso';
         this.toastr.error(errorMessage, 'Error');
       },
-      complete: () => {
-        this.isLoading = false;
-      }
     });
   }
 
