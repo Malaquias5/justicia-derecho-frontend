@@ -6,17 +6,20 @@ import { ApiResponse } from '../models/api-response.model';
 import { Seguimiento, SeguimientoRequest } from '../models/seguimiento.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SeguimientosService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/abogado/seguimientos`;
 
-  crearSeguimiento(seguimiento: SeguimientoRequest): Observable<ApiResponse<Seguimiento>> {
+  crearSeguimiento(seguimiento: any): Observable<ApiResponse<Seguimiento>> {
     return this.http.post<ApiResponse<Seguimiento>>(this.apiUrl, seguimiento);
   }
 
-  actualizarSeguimiento(id: number, seguimiento: SeguimientoRequest): Observable<ApiResponse<Seguimiento>> {
+  actualizarSeguimiento(
+    id: number,
+    seguimiento: SeguimientoRequest
+  ): Observable<ApiResponse<Seguimiento>> {
     return this.http.put<ApiResponse<Seguimiento>>(`${this.apiUrl}/${id}`, seguimiento);
   }
 

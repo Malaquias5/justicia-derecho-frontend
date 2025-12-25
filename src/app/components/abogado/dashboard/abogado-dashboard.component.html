@@ -1,189 +1,221 @@
-<div class="abogado-dashboard">
-  <!-- Bienvenida -->
-  <div class="card bg-primary text-white mb-4">
-    <div class="card-body">
-      <div class="row align-items-center">
-        <div class="col-md-8">
-          <h3 class="mb-2">Bienvenido, {{ user?.nombreCompleto || 'Abogado' }}</h3>
-          <p class="mb-0">Aquí puedes gestionar tus casos y ver el estado de tus actividades.</p>
+﻿<div class="abogado-dashboard p-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h2 class="h3 mb-2">
+      <i class="bi bi-graph-up me-2 text-primary"></i>Dashboard - Sistema de Gestión Judicial
+    </h2>
+    <p class="text-muted">Panel de control del Estudio Jurídico "Justicia & Derecho"</p>
+  </div>
+
+  <!-- Tarjetas de Estadísticas -->
+  <div class="row g-3 mb-4">
+    <!-- Total de Casos -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 stat-card stat-card-purple">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-folder-fill stat-icon mb-3"></i>
+          <h2 class="display-4 fw-bold mb-2">{{ totalCasos }}</h2>
+          <p class="mb-3 fw-semibold">Total de Casos</p>
+          <button class="btn btn-light btn-sm" routerLink="/abogado/casos">
+            <i class="bi bi-eye me-2"></i>Ver Todos
+          </button>
         </div>
-        <div class="col-md-4 text-end">
-          <i class="pi pi-briefcase" style="font-size: 4rem; opacity: 0.5;"></i>
+      </div>
+    </div>
+
+    <!-- Casos Pendientes -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 stat-card stat-card-pink">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-clock-fill stat-icon mb-3"></i>
+          <h2 class="display-4 fw-bold mb-2">{{ casosPendientes }}</h2>
+          <p class="mb-3 fw-semibold">Casos Pendientes</p>
+          <button class="btn btn-light btn-sm" (click)="filtrarPorEstado('Pendiente')">
+            <i class="bi bi-funnel me-2"></i>Filtrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- En Proceso -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 stat-card stat-card-blue">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-arrow-repeat stat-icon mb-3"></i>
+          <h2 class="display-4 fw-bold mb-2">{{ casosEnProceso }}</h2>
+          <p class="mb-3 fw-semibold">En Proceso</p>
+          <button class="btn btn-light btn-sm" (click)="filtrarPorEstado('En Proceso')">
+            <i class="bi bi-funnel me-2"></i>Filtrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Finalizados -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 stat-card stat-card-green">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-check-circle-fill stat-icon mb-3"></i>
+          <h2 class="display-4 fw-bold mb-2">{{ casosFinalizados }}</h2>
+          <p class="mb-3 fw-semibold">Finalizados</p>
+          <button class="btn btn-light btn-sm" (click)="filtrarPorEstado('Finalizado')">
+            <i class="bi bi-funnel me-2"></i>Filtrar
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Estadísticas rápidas -->
-  <div class="row mb-4">
-    <div class="col-md-3 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="text-muted mb-2">Mis Casos</h6>
-              <h3 class="mb-0">{{ totalCasos }}</h3>
-            </div>
-            <i class="pi pi-folder text-primary" style="font-size: 2rem"></i>
-          </div>
-          <div class="mt-2">
-            <small class="text-success">
-              <i class="pi pi-arrow-up"></i> 12% vs mes anterior
-            </small>
-          </div>
+  <div class="row">
+    <!-- Columna izquierda: Casos Próximos a Vencer -->
+    <div class="col-lg-8 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Casos Próximos a Vencer
+          </h5>
         </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="text-muted mb-2">Pendientes</h6>
-              <h3 class="mb-0">{{ casosPendientes }}</h3>
-            </div>
-            <i class="pi pi-clock text-warning" style="font-size: 2rem"></i>
+          <!-- Sin casos próximos a vencer -->
+          <div *ngIf="casosUrgentes.length === 0" class="text-center py-5">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            <p class="text-muted mt-3 mb-0">No hay casos próximos a vencer</p>
           </div>
-          <div class="mt-2">
-            <small class="text-danger">
-              <i class="pi pi-exclamation-triangle"></i> {{ pendientesUrgentes }} urgentes
-            </small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="text-muted mb-2">En Proceso</h6>
-              <h3 class="mb-0">{{ casosEnProceso }}</h3>
-            </div>
-            <i class="pi pi-cog text-info" style="font-size: 2rem"></i>
-          </div>
-          <div class="mt-2">
-            <small class="text-info">
-              <i class="pi pi-sync"></i> En seguimiento
-            </small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h6 class="text-muted mb-2">Finalizados</h6>
-              <h3 class="mb-0">{{ casosFinalizados }}</h3>
-            </div>
-            <i class="pi pi-check-circle text-success" style="font-size: 2rem"></i>
-          </div>
-          <div class="mt-2">
-            <small class="text-success">
-              <i class="pi pi-chart-line"></i> 94% eficiencia
-            </small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Casos urgentes y actividad reciente -->
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Casos Próximos a Vencer</h5>
-          <a routerLink="/abogado/casos" class="btn btn-sm btn-outline-primary">Ver todos</a>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>N° Caso</th>
-                <th>Cliente</th>
-                <th>Tipo</th>
-                <th>Vencimiento</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let caso of casosUrgentes">
-                <td class="fw-bold">{{ caso.numeroCaso }}</td>
-                <td>{{ caso.patrocinado }}</td>
-                <td>{{ caso.tipoCaso }}</td>
-                <td>
-                  <span class="badge" [ngClass]="{
-                    'bg-danger': caso.diasRestantes <= 3,
-                    'bg-warning text-dark': caso.diasRestantes > 3 && caso.diasRestantes <= 7,
-                    'bg-info': caso.diasRestantes > 7
-                  }">
-                    {{ caso.diasRestantes }} días
-                  </span>
-                </td>
-                <td>
-                  <span class="badge" [ngClass]="getEstadoClass(caso.estado)">
-                    {{ caso.estado }}
-                  </span>
-                </td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary" 
-                          [routerLink]="['/abogado/casos', caso.idRegistro]">
-                    <i class="bi bi-eye"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr *ngIf="casosUrgentes.length === 0">
-                <td colspan="6" class="text-center py-4">
-                  <i class="bi bi-check-circle text-success me-2"></i>
-                  No hay casos urgentes
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Con casos próximos a vencer -->
+          <div *ngIf="casosUrgentes.length > 0" class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>N° Caso</th>
+                  <th>Patrocinado</th>
+                  <th>Vencimiento</th>
+                  <th>Días Restantes</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let caso of casosUrgentes">
+                  <td class="fw-semibold">{{ caso.numeroCaso }}</td>
+                  <td>{{ caso.patrocinado }}</td>
+                  <td>{{ formatDate(caso.fechaVencimiento) }}</td>
+                  <td>
+                    <span 
+                      class="badge"
+                      [ngClass]="{
+                        'bg-danger': (caso.diasRestantes ?? 0) <= 3,
+                        'bg-warning text-dark': (caso.diasRestantes ?? 0) > 3 && (caso.diasRestantes ?? 0) <= 7,
+                        'bg-info': (caso.diasRestantes ?? 0) > 7
+                      }">
+                      {{ caso.diasRestantes ?? 0 }} día(s)
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge bg-warning text-dark">{{ caso.estado }}</span>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-outline-primary"
+                      [routerLink]="['/abogado/casos', caso.idRegistro]">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">Accesos Rápidos</h5>
+    <!-- Columna derecha: Acciones Rápidas y Distribución -->
+    <div class="col-lg-4 mb-4">
+      <!-- Acciones Rápidas -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0">
+            <i class="bi bi-lightning-fill text-primary me-2"></i>Acciones Rápidas
+          </h5>
         </div>
         <div class="card-body">
           <div class="d-grid gap-2">
-            <button class="btn btn-outline-success" routerLink="/abogado/casos/nuevo">
-              <i class="bi bi-plus-circle me-2"></i>Nuevo Caso
+            <button 
+              class="btn btn-primary btn-lg"
+              routerLink="/abogado/casos/nuevo">
+              <i class="bi bi-plus-circle-fill me-2"></i>Registrar Nuevo Caso
             </button>
-            <button class="btn btn-outline-primary" routerLink="/abogado/casos">
-              <i class="bi bi-folder me-2"></i>Mis Casos
+            <button 
+              class="btn btn-info btn-lg text-white"
+              routerLink="/abogado/casos">
+              <i class="bi bi-list me-2"></i>Ver Todos los Casos
             </button>
-            <button class="btn btn-outline-info" routerLink="/abogado/calendario">
-              <i class="bi bi-calendar me-2"></i>Calendario
+            <button 
+              class="btn btn-secondary btn-lg"
+              (click)="buscarCasos()">
+              <i class="bi bi-search me-2"></i>Buscar Casos
             </button>
           </div>
+        </div>
+      </div>
 
-          <hr>
-
-          <div class="mt-3">
-            <h6 class="text-muted mb-3">Resumen de Actividad</h6>
-            <div class="mb-2">
-              <small class="text-muted">Casos activos</small>
-              <div class="progress" style="height: 5px;">
-                <div class="progress-bar bg-success" [style.width.%]="(totalCasos / 100) * 100"></div>
+      <!-- Distribución por Dependencia -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0">
+            <i class="bi bi-pie-chart-fill me-2"></i>Distribución por Dependencia
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- COMISARÍA -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="fw-semibold">COMISARÍA</span>
+              <span class="fw-bold">{{ porcentajeComisaria }}%</span>
+            </div>
+            <div class="progress" style="height: 25px;">
+              <div 
+                class="progress-bar bg-primary"
+                role="progressbar"
+                [style.width.%]="porcentajeComisaria"
+                [attr.aria-valuenow]="porcentajeComisaria"
+                aria-valuemin="0"
+                aria-valuemax="100">
+                {{ casosComisaria }} caso(s)
               </div>
             </div>
-            <div class="mb-2">
-              <small class="text-muted">Tasa de éxito</small>
-              <div class="progress" style="height: 5px;">
-                <div class="progress-bar bg-primary" style="width: 94%"></div>
+          </div>
+
+          <!-- FISCALÍA -->
+          <div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="fw-semibold">FISCALÍA</span>
+              <span class="fw-bold">{{ porcentajeFiscalia }}%</span>
+            </div>
+            <div class="progress" style="height: 25px;">
+              <div 
+                class="progress-bar bg-info"
+                role="progressbar"
+                [style.width.%]="porcentajeFiscalia"
+                [attr.aria-valuenow]="porcentajeFiscalia"
+                aria-valuemin="0"
+                aria-valuemax="100">
+                {{ casosFiscalia }} caso(s)
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Logo del Sistema -->
+      <div class="text-center mt-4 p-4">
+        <i class="bi bi-scales text-primary" style="font-size: 4rem;"></i>
+        <h5 class="mt-3 fw-bold">JUSTICIA & DERECHO</h5>
+        <p class="text-muted small mb-2">Sistema de Gestión Judicial</p>
+        <p class="text-muted small">
+          <i class="bi bi-clock me-1"></i>
+          miércoles, 24 diciembre 2025
+        </p>
       </div>
     </div>
   </div>

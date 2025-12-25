@@ -161,9 +161,9 @@ export class SidebarComponent implements OnInit {
         roles: ['Admin'],
       },
       {
-        label: 'Nuevo Caso',
-        icon: 'pi pi-plus-circle',
-        route: '/admin/casos/nuevo',
+        label: 'Seguimientos',
+        icon: 'pi pi-list',
+        route: '/abogado/seguimientos',
         roles: ['Admin'],
       },
 
@@ -187,6 +187,14 @@ export class SidebarComponent implements OnInit {
         icon: 'pi pi-plus-circle',
         route: '/abogado/casos/nuevo',
         roles: ['Abogado'],
+      },
+      {
+        label: 'Próximos a Vencer',
+        icon: 'pi pi-clock',
+        route: '/abogado/proximos-vencer',
+        roles: ['Abogado'],
+        badge: 3,
+        badgeSeverity: 'danger',
       },
       {
         label: 'Documentos',

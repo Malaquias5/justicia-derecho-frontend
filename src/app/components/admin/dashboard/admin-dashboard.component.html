@@ -1,190 +1,160 @@
-<div class="admin-dashboard">
-  <!-- Header -->
+﻿<div class="admin-dashboard p-4">
   <div class="mb-4">
-    <h1 class="h2 mb-2">Panel de Administración</h1>
-    <p class="text-muted">Bienvenido al sistema de gestión judicial</p>
+    <h1 class="h2 mb-2">
+      <i class="bi bi-bar-chart-line me-2"></i>
+      Dashboard - Sistema de Gestión Judicial
+    </h1>
+    <p class="text-muted">Panel de control del Estudio Jurídico "Justicia & Derecho"</p>
   </div>
 
-  <!-- Estadísticas rápidas -->
-  <div class="row mb-4">
-    <div class="col-md-3 mb-3">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 class="display-6 fw-bold text-primary mb-1">{{ stats[0]?.value || '0' }}</h2>
-              <p class="text-muted mb-0 small">{{ stats[0]?.description }}</p>
-            </div>
-            <i class="bi bi-folder-fill text-primary" style="font-size: 3rem; opacity: 0.2;"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 class="display-6 fw-bold text-success mb-1">{{ stats[1]?.value || '0' }}</h2>
-              <p class="text-muted mb-0 small">{{ stats[1]?.description }}</p>
-            </div>
-            <i class="bi bi-people-fill text-success" style="font-size: 3rem; opacity: 0.2;"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 class="display-6 fw-bold text-warning mb-1">{{ stats[2]?.value || '0' }}</h2>
-              <p class="text-muted mb-0 small">{{ stats[2]?.description }}</p>
-            </div>
-            <i class="bi bi-clock-fill text-warning" style="font-size: 3rem; opacity: 0.2;"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3 mb-3">
-      <div class="card h-100 border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 class="display-6 fw-bold text-info mb-1">{{ stats[3]?.value || '0' }}</h2>
-              <p class="text-muted mb-0 small">{{ stats[3]?.description }}</p>
-            </div>
-            <i class="bi bi-check-circle-fill text-info" style="font-size: 3rem; opacity: 0.2;"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Botones de Acción Rápida -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex gap-2 flex-wrap">
-        <button class="btn btn-primary" routerLink="/admin/casos/nuevo">
-          <i class="bi bi-plus-circle me-2"></i>Nuevo Caso
-        </button>
-        <button class="btn btn-success" routerLink="/admin/usuarios/nuevo">
-          <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
-        </button>
-        <button class="btn btn-info" routerLink="/admin/estadisticas">
-          <i class="bi bi-bar-chart me-2"></i>Ver Reportes
-        </button>
-        <button class="btn btn-outline-secondary" (click)="exportarDatos()">
-          <i class="bi bi-download me-2"></i>Exportar Datos
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Gráficos y Actividad Reciente -->
-  <div class="row mb-4">
-    <div class="col-md-8 mb-3">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-pie-chart me-2 text-primary"></i>Distribución de Casos por Estado
-          </h5>
-        </div>
-        <div class="card-body">
-          <canvas #chartCanvas id="casosChart" height="80"></canvas>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-clock-history me-2 text-primary"></i>Actividad Reciente
-          </h5>
-        </div>
-        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-          <div *ngFor="let activity of recentActivity; let last = last" class="activity-item mb-3" [class.pb-3]="!last" [class.border-bottom]="!last">
-            <div class="d-flex align-items-start">
-              <div class="rounded-circle p-2 me-3" [ngClass]="activity.bgClass" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                <i [class]="activity.icon" [ngClass]="activity.iconClass" style="font-size: 1.2rem;"></i>
+  <div class="row g-4">
+    <!-- Columna principal (izquierda) -->
+    <div class="col-lg-8">
+      <!-- Tarjetas de estadísticas principales -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm gradient-purple h-100 text-white">
+            <div class="card-body text-center p-5">
+              <div class="mb-3">
+                <i class="bi bi-folder2-open" style="font-size: 3rem;"></i>
               </div>
-              <div class="flex-grow-1">
-                <div class="fw-semibold small">{{ activity.title }}</div>
-                <div class="text-muted" style="font-size: 0.85rem;">{{ activity.description }}</div>
-                <div class="text-muted" style="font-size: 0.75rem;">
-                  <i class="bi bi-clock me-1"></i>{{ activity.time }}
-                </div>
-              </div>
+              <h2 class="display-3 fw-bold mb-2">{{ totalCasos }}</h2>
+              <p class="mb-4">Total de Casos</p>
+              <button class="btn btn-light" [routerLink]="['/admin/casos']">
+                <i class="bi bi-eye me-2"></i>Ver Todos
+              </button>
             </div>
           </div>
-          <div *ngIf="recentActivity.length === 0" class="text-center text-muted py-4">
-            <i class="bi bi-clock-history" style="font-size: 2rem; opacity: 0.3;"></i>
-            <p class="mt-2 mb-0">No hay actividad reciente</p>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm gradient-green h-100 text-white">
+            <div class="card-body text-center p-5">
+              <div class="mb-3">
+                <i class="bi bi-check-circle" style="font-size: 3rem;"></i>
+              </div>
+              <h2 class="display-3 fw-bold mb-2">{{ casosFinalizados }}</h2>
+              <p class="mb-4">Finalizados</p>
+              <button class="btn btn-light" (click)="verFinalizados()">
+                <i class="bi bi-search me-2"></i>Filtrar
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Tabla de casos urgentes -->
-  <div class="row">
-    <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-          <h5 class="card-title mb-0">
-            <i class="bi bi-exclamation-triangle me-2 text-danger"></i>Casos Próximos a Vencer
+      <!-- Casos Próximos a Vencer -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Casos Próximos a Vencer
           </h5>
-          <a routerLink="/admin/casos" class="btn btn-sm btn-primary">
-            <i class="bi bi-arrow-right-circle me-1"></i>Ver todos
-          </a>
+          <span class="badge bg-danger rounded-circle" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+            {{ casosUrgentes.length }}
+          </span>
         </div>
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
+        <div class="card-body p-0">
+          <div *ngIf="casosUrgentes.length === 0" class="p-4 text-center text-muted">
+            No hay casos próximos a vencer
+          </div>
+          <table *ngIf="casosUrgentes.length > 0" class="table table-hover mb-0">
             <thead class="table-light">
               <tr>
                 <th>N° Caso</th>
-                <th>Abogado</th>
-                <th>Patrocinado</th>
+                <th>Cliente</th>
+                <th>Tipo</th>
                 <th>Vencimiento</th>
                 <th>Días Restantes</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let caso of casosUrgentes">
-                <td class="fw-bold">{{ caso.numeroCaso }}</td>
-                <td>{{ caso.abogado }}</td>
+                <td><strong>{{ caso.numeroCaso }}</strong></td>
                 <td>{{ caso.patrocinado }}</td>
-                <td>{{ caso.fechaVencimiento | date:'dd/MM/yyyy' }}</td>
+                <td>{{ caso.tipoCaso }}</td>
+                <td>{{ formatDate(caso.fechaVencimiento) }}</td>
                 <td>
-                  <span class="badge" [ngClass]="{
-                    'bg-danger': caso.diasRestantes <= 3,
-                    'bg-warning text-dark': caso.diasRestantes > 3 && caso.diasRestantes <= 7
-                  }">
-                    {{ caso.diasRestantes }} días
+                  <span class="badge bg-warning text-dark">
+                    {{ caso.diasRestantes }} día(s)
                   </span>
                 </td>
                 <td>
-                  <span class="badge" [ngClass]="getEstadoClass(caso.estado)">{{ caso.estado }}</span>
-                </td>
-                <td>
-                  <button type="button" class="btn btn-sm btn-outline-primary" 
+                  <button class="btn btn-sm btn-primary rounded-circle" 
                           [routerLink]="['/admin/casos', caso.idRegistro]"
-                          title="Ver detalles">
+                          style="width: 32px; height: 32px;">
                     <i class="bi bi-eye"></i>
                   </button>
-                </td>
-              </tr>
-              <tr *ngIf="casosUrgentes.length === 0">
-                <td colspan="7" class="text-center py-4">
-                  <i class="bi bi-check-circle text-success me-2"></i>
-                  No hay casos urgentes
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- Columna lateral derecha -->
+    <div class="col-lg-4">
+      <!-- Acciones Rápidas -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-lightning-charge me-2"></i>
+            Acciones Rápidas
+          </h5>
+        </div>
+        <div class="card-body p-3">
+          <div class="d-grid gap-2">
+            <button class="btn btn-info text-white btn-lg" [routerLink]="['/admin/casos']">
+              <i class="bi bi-list-ul me-2"></i>
+              Ver Todos los Casos
+            </button>
+            <button class="btn btn-secondary btn-lg" [routerLink]="['/admin/casos']">
+              <i class="bi bi-search me-2"></i>
+              Buscar Casos
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distribución por Dependencia -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">
+            <i class="bi bi-pie-chart me-2"></i>
+            Distribución por Dependencia
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngFor="let dep of distribucionDependencia" class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span><strong>{{ dep.nombre }}</strong></span>
+              <span class="text-muted">({{ dep.porcentaje }}%)</span>
+            </div>
+            <div class="progress" style="height: 30px;">
+              <div class="progress-bar" [ngClass]="dep.class" 
+                   [style.width.%]="dep.porcentaje"
+                   role="progressbar">
+                <strong>{{ dep.nombre }} ({{ dep.porcentaje }}%)</strong>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="distribucionDependencia.length === 0" class="text-center text-muted py-3">
+            No hay datos disponibles
+          </div>
+        </div>
+      </div>
+
+      <!-- Logo al final -->
+      <div class="text-center mt-4">
+        <i class="bi bi-scale" style="font-size: 4rem; color: #0d6efd;"></i>
+        <h5 class="mt-2 text-primary">JUSTICIA & DERECHO</h5>
+        <p class="text-muted small">Sistema de Gestión Judicial</p>
+        <p class="text-muted small">
+          <i class="bi bi-clock me-1"></i>
+          {{ fechaActual }}
+        </p>
       </div>
     </div>
   </div>

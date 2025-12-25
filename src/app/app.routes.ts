@@ -77,18 +77,10 @@ export const routes: Routes = [
           {
             path: '',
             loadComponent: () =>
-              import('./components/abogado/casos/list/casos-list.component').then(
-                (m) => m.CasosListComponent
+              import('./components/admin/casos-list/casos-list.component').then(
+                (m) => m.AdminCasosListComponent
               ),
             title: 'Todos los Casos',
-          },
-          {
-            path: 'nuevo',
-            loadComponent: () =>
-              import('./components/abogado/casos/create/caso-create.component').then(
-                (m) => m.CasoCreateComponent
-              ),
-            title: 'Nuevo Caso',
           },
           {
             path: ':id',
@@ -99,7 +91,7 @@ export const routes: Routes = [
             title: 'Detalle del Caso',
           },
           {
-            path: 'editar/:id',
+            path: ':id/editar',
             loadComponent: () =>
               import('./components/abogado/casos/edit/caso-edit.component').then(
                 (m) => m.CasoEditComponent
@@ -166,7 +158,7 @@ export const routes: Routes = [
             title: 'Detalle del Caso',
           },
           {
-            path: 'editar/:id',
+            path: ':id/editar',
             loadComponent: () =>
               import('./components/abogado/casos/edit/caso-edit.component').then(
                 (m) => m.CasoEditComponent
@@ -174,6 +166,14 @@ export const routes: Routes = [
             title: 'Editar Caso',
           },
         ],
+      },
+      {
+        path: 'proximos-vencer',
+        loadComponent: () =>
+          import('./components/abogado/proximos-vencer/proximos-vencer.component').then(
+            (m) => m.ProximosVencerComponent
+          ),
+        title: 'Casos Próximos a Vencer',
       },
       {
         path: 'calendario',

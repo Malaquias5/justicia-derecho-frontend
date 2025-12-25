@@ -1,0 +1,205 @@
+<div class="caso-create-container p-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a [routerLink]="['/abogado/casos']">Casos</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Nuevo Caso</li>
+    </ol>
+  </nav>
+
+  <!-- Header -->
+  <div class="mb-4">
+    <h2 class="h3 mb-2">
+      <i class="bi bi-plus-circle-fill me-2"></i>Registrar Nuevo Caso Judicial
+    </h2>
+  </div>
+
+  <!-- Formulario -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-primary text-white py-3">
+      <h5 class="mb-0">
+        <i class="bi bi-person me-2"></i>Información del Caso
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      <form [formGroup]="casoForm" (ngSubmit)="onSubmit()">
+        <div class="row g-4">
+          <!-- Sección: Información del Caso -->
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-info-circle me-2"></i>Información del Caso
+            </h6>
+          </div>
+
+          <div class="col-md-6">
+            <label for="abogado" class="form-label fw-semibold">
+              <i class="bi bi-person-badge me-1"></i>Abogado Responsable
+            </label>
+            <input 
+              type="text" 
+              id="abogado" 
+              class="form-control form-control-lg" 
+              formControlName="abogado"
+              readonly
+              placeholder="Dr. Juan Pérez García">
+            <small class="text-muted">Este campo se asigna automáticamente</small>
+          </div>
+
+          <div class="col-md-6">
+            <label for="patrocinado" class="form-label fw-semibold">
+              Patrocinado (Cliente) <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="patrocinado" 
+              class="form-control form-control-lg" 
+              formControlName="patrocinado"
+              placeholder="Ej: Juan Carlos Pérez Rodríguez"
+              [class.is-invalid]="casoForm.get('patrocinado')?.invalid && casoForm.get('patrocinado')?.touched">
+            <div class="invalid-feedback" *ngIf="casoForm.get('patrocinado')?.hasError('required')">
+              Este campo es requerido
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="numeroCaso" class="form-label fw-semibold">
+              <i class="bi bi-hash me-1"></i>Número de Caso
+            </label>
+            <input 
+              type="text" 
+              id="numeroCaso" 
+              class="form-control form-control-lg" 
+              formControlName="numeroCaso"
+              placeholder="Ej: CASO-2024-0001 (se genera automático si se deja vacío)">
+            <small class="text-muted">Dejar vacío para generar automáticamente</small>
+          </div>
+
+          <div class="col-md-6">
+            <label for="tipoCaso" class="form-label fw-semibold">
+              Tipo de Caso <span class="text-danger">*</span>
+            </label>
+            <select 
+              id="tipoCaso" 
+              class="form-select form-select-lg" 
+              formControlName="tipoCaso"
+              [class.is-invalid]="casoForm.get('tipoCaso')?.invalid && casoForm.get('tipoCaso')?.touched">
+              <option value="">-- Seleccione un tipo --</option>
+              <option *ngFor="let tipo of tiposCaso" [value]="tipo">{{ tipo }}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="casoForm.get('tipoCaso')?.hasError('required')">
+              Debe seleccionar un tipo de caso
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-building me-1"></i>Dependencia <span class="text-danger">*</span>
+            </label>
+            <div class="d-flex gap-3">
+              <button 
+                type="button"
+                class="btn btn-lg flex-fill"
+                [class.btn-primary]="casoForm.get('dependencia')?.value === 'COMISARIA'"
+                [class.btn-outline-secondary]="casoForm.get('dependencia')?.value !== 'COMISARIA'"
+                (click)="casoForm.patchValue({dependencia: 'COMISARIA'})">
+                <i class="bi bi-shield-fill me-2"></i>COMISARIA
+              </button>
+              <button 
+                type="button"
+                class="btn btn-lg flex-fill"
+                [class.btn-success]="casoForm.get('dependencia')?.value === 'FISCALIA'"
+                [class.btn-outline-secondary]="casoForm.get('dependencia')?.value !== 'FISCALIA'"
+                (click)="casoForm.patchValue({dependencia: 'FISCALIA'})">
+                <i class="bi bi-bank me-2"></i>FISCALIA
+              </button>
+            </div>
+            <div class="text-danger small mt-1" *ngIf="casoForm.get('dependencia')?.invalid && casoForm.get('dependencia')?.touched">
+              Debe seleccionar una dependencia
+            </div>
+          </div>
+
+          <!-- Sección: Fechas y Descripción -->
+          <div class="col-12 mt-4">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="bi bi-calendar3 me-2"></i>Fechas y Descripción
+            </h6>
+          </div>
+
+          <div class="col-md-6">
+            <label for="fechaIngreso" class="form-label fw-semibold">
+              <i class="bi bi-calendar-check me-1"></i>Fecha de Ingreso <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="fechaIngreso" 
+              class="form-control form-control-lg" 
+              formControlName="fechaIngreso"
+              [class.is-invalid]="casoForm.get('fechaIngreso')?.invalid && casoForm.get('fechaIngreso')?.touched">
+            <div class="invalid-feedback" *ngIf="casoForm.get('fechaIngreso')?.hasError('required')">
+              Este campo es requerido
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="fechaVencimiento" class="form-label fw-semibold">
+              <i class="bi bi-calendar-x me-1"></i>Fecha de Vencimiento <span class="text-danger">*</span>
+            </label>
+            <input 
+              type="date" 
+              id="fechaVencimiento" 
+              class="form-control form-control-lg" 
+              formControlName="fechaVencimiento"
+              [class.is-invalid]="casoForm.get('fechaVencimiento')?.invalid && casoForm.get('fechaVencimiento')?.touched">
+            <small class="text-muted">Fecha límite para presentar documentos</small>
+            <div class="invalid-feedback" *ngIf="casoForm.get('fechaVencimiento')?.hasError('required')">
+              Este campo es requerido
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <label for="opcionLlenado" class="form-label fw-semibold">
+              <i class="bi bi-file-text me-1"></i>Descripción del Caso
+            </label>
+            <textarea 
+              id="opcionLlenado" 
+              class="form-control" 
+              formControlName="opcionLlenado"
+              rows="4"
+              maxlength="200"
+              placeholder="Descripción detallada del caso, hechos relevantes, etc."></textarea>
+            <small class="text-muted">Máximo 200 caracteres</small>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="d-flex justify-content-between">
+              <button 
+                type="button" 
+                class="btn btn-secondary btn-lg"
+                [routerLink]="['/abogado/casos']"
+                [disabled]="isLoading">
+                <i class="bi bi-arrow-left me-2"></i>Cancelar
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary btn-lg"
+                [disabled]="casoForm.invalid || isLoading">
+                <span *ngIf="!isLoading">
+                  <i class="bi bi-save me-2"></i>Registrar Caso
+                </span>
+                <span *ngIf="isLoading">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  Guardando...
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

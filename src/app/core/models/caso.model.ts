@@ -8,6 +8,7 @@ export interface Caso {
   tipoCaso: string;
   dependencia: 'COMISARIA' | 'FISCALIA';
   opcionLlenado?: string;
+  descripcion?: string;
   estado: 'Pendiente' | 'En Proceso' | 'Finalizado';
   usuarioRegistro: string;
   fechaRegistro: string | Date;

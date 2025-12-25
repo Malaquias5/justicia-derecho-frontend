@@ -1,0 +1,165 @@
+<div class="casos-list-container p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h3 mb-1">
+        <i class="bi bi-folder2-open me-2"></i>
+        Todos los Casos
+      </h2>
+      <p class="text-muted mb-0">Gestión de casos judiciales</p>
+    </div>
+  </div>
+
+  <!-- Filtros de Búsqueda -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="bi bi-funnel me-2"></i>
+        Filtros de Búsqueda
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Número de Caso</label>
+          <input type="text" class="form-control" [(ngModel)]="filtros.numeroCaso" placeholder="CASO-2024-0001">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Estado</label>
+          <select class="form-select" [(ngModel)]="filtros.estado">
+            <option value="">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="En Proceso">En Proceso</option>
+            <option value="Finalizado">Finalizado</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Dependencia</label>
+          <select class="form-select" [(ngModel)]="filtros.dependencia">
+            <option value="">Todas</option>
+            <option value="COMISARIA">COMISARIA</option>
+            <option value="FISCALIA">FISCALIA</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha Desde</label>
+          <input type="date" class="form-control" [(ngModel)]="filtros.fechaDesde">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Fecha Hasta</label>
+          <input type="date" class="form-control" [(ngModel)]="filtros.fechaHasta">
+        </div>
+        <div class="col-md-9 d-flex align-items-end gap-2">
+          <button class="btn btn-primary" (click)="aplicarFiltros()">
+            <i class="bi bi-search me-2"></i>Buscar
+          </button>
+          <button class="btn btn-secondary" (click)="limpiarFiltros()">
+            <i class="bi bi-x-circle me-2"></i>Limpiar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información de resultados -->
+  <div *ngIf="!isLoading && casosFiltrados.length > 0" class="alert alert-info mb-3">
+    <i class="bi bi-info-circle me-2"></i>
+    Mostrando <strong>{{ rangoInicio }}</strong> - <strong>{{ rangoFin }}</strong> de <strong>{{ casosFiltrados.length }}</strong> registros
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Sin resultados -->
+  <div *ngIf="!isLoading && casosFiltrados.length === 0" class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    No se encontraron casos con los filtros seleccionados.
+  </div>
+
+  <!-- Tabla de casos -->
+  <div *ngIf="!isLoading && casosFiltrados.length > 0" class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover table-striped mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>N° Caso</th>
+            <th>Patrocinado</th>
+            <th>Abogado</th>
+            <th>Tipo de Caso</th>
+            <th>Dependencia</th>
+            <th>Fecha Ingreso</th>
+            <th>Vencimiento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let caso of casosPaginados">
+            <td><strong>{{ caso.numeroCaso }}</strong></td>
+            <td>{{ caso.patrocinado }}</td>
+            <td>{{ caso.abogado }}</td>
+            <td>{{ caso.tipoCaso }}</td>
+            <td>
+              <span class="badge" [ngClass]="getDependenciaClass(caso.dependencia)">
+                {{ caso.dependencia }}
+              </span>
+            </td>
+            <td>{{ formatDate(caso.fechaIngreso) }}</td>
+            <td>
+              {{ formatDate(caso.fechaVencimiento) }}
+              <span *ngIf="caso.diasRestantes !== undefined" class="badge ms-1" [ngClass]="getUrgenciaClass(caso.diasRestantes)">
+                {{ caso.diasRestantes }} día(s)
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getEstadoClass(caso.estado)">
+                {{ caso.estado }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-primary" 
+                        [routerLink]="['/admin/casos', caso.idRegistro]"
+                        title="Ver detalle">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-outline-warning" 
+                        [routerLink]="['/admin/casos', caso.idRegistro, 'editar']"
+                        title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-outline-danger" 
+                        (click)="eliminarCaso(caso)"
+                        title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="card-footer">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        <div class="btn-group">
+          <button class="btn btn-outline-secondary" 
+                  (click)="paginaAnterior()" 
+                  [disabled]="paginaActual === 1">
+            <i class="bi bi-chevron-left"></i> Anterior
+          </button>
+          <button class="btn btn-outline-secondary" 
+                  (click)="siguientePagina()" 
+                  [disabled]="paginaActual === totalPaginas">
+            Siguiente <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

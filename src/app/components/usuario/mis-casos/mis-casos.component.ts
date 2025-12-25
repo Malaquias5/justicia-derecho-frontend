@@ -213,4 +213,31 @@ export class MisCasosComponent implements OnInit {
       this.currentPage = 1;
     }
   }
+
+  trackByCaso(index: number, caso: any): any {
+    return caso.idRegistro || index;
+  }
+
+  getCardBorderClass(urgencia: string): string {
+    switch (urgencia) {
+      case 'Vencido':
+        return 'border-danger';
+      case 'Urgente':
+      case 'Próximo':
+        return 'border-warning';
+      case 'Normal':
+        return 'border-success';
+      default:
+        return 'border-secondary';
+    }
+  }
+
+  getDiasRestantesClass(diasRestantes: number): string {
+    if (diasRestantes <= 3) {
+      return 'text-danger fw-bold';
+    } else if (diasRestantes > 3 && diasRestantes <= 7) {
+      return 'text-warning';
+    }
+    return '';
+  }
 }

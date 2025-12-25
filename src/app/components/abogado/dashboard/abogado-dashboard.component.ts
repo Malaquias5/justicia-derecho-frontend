@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CasosService } from '../../../core/services/casos.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { Caso } from '../../../core/models/caso.model';
 
 @Component({
   selector: 'app-abogado-dashboard',
@@ -14,34 +15,27 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class AbogadoDashboardComponent implements OnInit {
   user: any = null;
-  casos: any[] = [];
-  casosUrgentes: any[] = [];
+  casos: Caso[] = [];
+  casosUrgentes: Caso[] = [];
 
+  // Estadísticas
   totalCasos = 0;
   casosPendientes = 0;
   casosEnProceso = 0;
   casosFinalizados = 0;
-  pendientesUrgentes = 0;
 
-  // Paginación
-  currentPage = 1;
-  itemsPerPage = 5;
-  totalPages = 0;
-
-  chartData: any;
-  chartOptions = {
-    plugins: {
-      legend: {
-        position: 'bottom',
-      },
-    },
-  };
+  // Distribución por dependencia
+  casosComisaria = 0;
+  casosFiscalia = 0;
+  porcentajeComisaria = 0;
+  porcentajeFiscalia = 0;
 
   constructor(
     private authService: AuthService,
     private casosService: CasosService,
     private toastr: ToastrService,
-    private cd: ChangeDetectorRef // 2. Inyéctalo aquí
+    private router: Router,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -53,18 +47,15 @@ export class AbogadoDashboardComponent implements OnInit {
     this.casosService.listarCasos().subscribe({
       next: (response) => {
         if (response.success) {
-          setTimeout(() => {
-            this.casos = response.data;
-            this.calcularEstadisticas();
-            this.filtrarCasosUrgentes();
-            this.actualizarChart();
-
-            // 3. Agrega esto para avisar a Angular que los datos cambiaron
-            this.cd.detectChanges();
-          }, 0);
+          this.casos = response.data || [];
+          this.calcularEstadisticas();
+          this.calcularDistribucionDependencia();
+          this.filtrarCasosUrgentes();
+          this.cd.detectChanges();
         }
       },
       error: (error) => {
+        console.error('Error al cargar casos:', error);
         this.toastr.error('Error al cargar casos', 'Error');
       },
     });
@@ -75,28 +66,53 @@ export class AbogadoDashboardComponent implements OnInit {
     this.casosPendientes = this.casos.filter((c) => c.estado === 'Pendiente').length;
     this.casosEnProceso = this.casos.filter((c) => c.estado === 'En Proceso').length;
     this.casosFinalizados = this.casos.filter((c) => c.estado === 'Finalizado').length;
-    this.pendientesUrgentes = this.casos.filter(
-      (c) => c.estado === 'Pendiente' && c.diasRestantes <= 7
-    ).length;
+  }
+
+  calcularDistribucionDependencia(): void {
+    this.casosComisaria = this.casos.filter((c) => c.dependencia === 'COMISARIA').length;
+    this.casosFiscalia = this.casos.filter((c) => c.dependencia === 'FISCALIA').length;
+
+    if (this.totalCasos > 0) {
+      this.porcentajeComisaria = Math.round((this.casosComisaria / this.totalCasos) * 100);
+      this.porcentajeFiscalia = Math.round((this.casosFiscalia / this.totalCasos) * 100);
+    } else {
+      this.porcentajeComisaria = 0;
+      this.porcentajeFiscalia = 0;
+    }
   }
 
   filtrarCasosUrgentes(): void {
+    // Casos próximos a vencer (15 días o menos) y no finalizados
     this.casosUrgentes = this.casos
-      .filter((c) => c.diasRestantes <= 14 && c.estado !== 'Finalizado')
-      .sort((a, b) => a.diasRestantes - b.diasRestantes);
+      .filter((c) => {
+        if (c.diasRestantes === undefined) return false;
+        return c.diasRestantes <= 15 && c.estado !== 'Finalizado';
+      })
+      .sort((a, b) => {
+        const diasA = a.diasRestantes ?? 999;
+        const diasB = b.diasRestantes ?? 999;
+        return diasA - diasB;
+      })
+      .slice(0, 5); // Mostrar máximo 5
   }
 
-  actualizarChart(): void {
-    this.chartData = {
-      labels: ['Pendientes', 'En Proceso', 'Finalizados'],
-      datasets: [
-        {
-          data: [this.casosPendientes, this.casosEnProceso, this.casosFinalizados],
-          backgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0'],
-          hoverBackgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0'],
-        },
-      ],
-    };
+  filtrarPorEstado(estado: string): void {
+    this.router.navigate(['/abogado/casos'], {
+      queryParams: { estado: estado },
+    });
+  }
+
+  buscarCasos(): void {
+    this.router.navigate(['/abogado/casos']);
+  }
+
+  formatDate(date: string | Date): string {
+    if (!date) return '-';
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
   getDiasSeverity(dias: number): 'danger' | 'warn' | 'info' {

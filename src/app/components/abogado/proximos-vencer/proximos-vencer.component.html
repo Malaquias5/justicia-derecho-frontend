@@ -1,0 +1,99 @@
+<div class="proximos-vencer-container p-4">
+
+  <h2 class="h3 mb-3">
+    <i class="bi bi-clock-history text-warning me-2"></i>
+    Casos Próximos a Vencer
+  </h2>
+  
+  <p class="text-muted mb-3">
+    Mostrando casos que vencen en los próximos <strong>{{ diasSeleccionados }} días</strong>.
+  </p>
+
+  <div class="d-flex gap-2 mb-4">
+    <button class="btn"
+      [class.btn-warning]="diasSeleccionados === 3"
+      [class.btn-outline-secondary]="diasSeleccionados !== 3"
+      (click)="cambiarFiltro(3)">3 días</button>
+
+    <button class="btn"
+      [class.btn-warning]="diasSeleccionados === 7"
+      [class.btn-outline-secondary]="diasSeleccionados !== 7"
+      (click)="cambiarFiltro(7)">7 días</button>
+
+    <button class="btn"
+      [class.btn-warning]="diasSeleccionados === 15"
+      [class.btn-outline-secondary]="diasSeleccionados !== 15"
+      (click)="cambiarFiltro(15)">15 días</button>
+
+    <button class="btn btn-primary" (click)="verTodos()">Ver todos</button>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <div *ngIf="!isLoading && casos.length === 0" class="alert alert-success">
+    No hay casos próximos a vencer.
+  </div>
+
+  <div *ngIf="casos.length > 0 && !isLoading" class="card shadow-sm">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Urgencia</th>
+          <th>N° Caso</th>
+          <th>Patrocinado</th>
+          <th>Tipo</th>
+          <th>Dependencia</th>
+          <th>Vencimiento</th>
+          <th>Días</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let caso of casosPaginados">
+          <td>
+            <span class="badge" [ngClass]="getNivelUrgenciaClass(caso.diasRestantes)">
+              {{ getNivelUrgenciaTexto(caso.diasRestantes) }}
+            </span>
+          </td>
+          <td>{{ caso.numeroCaso }}</td>
+          <td>{{ caso.patrocinado }}</td>
+          <td>{{ caso.tipoCaso }}</td>
+          <td>{{ caso.dependencia }}</td>
+          <td>{{ formatDate(caso.fechaVencimiento) }}</td>
+          <td>{{ getDiasRestantesTexto(caso.diasRestantes) }}</td>
+          <td>
+            <span class="badge" [ngClass]="getEstadoClass(caso.estado)">
+              {{ caso.estado }}
+            </span>
+          </td>
+          <td>
+            <a class="btn btn-sm btn-outline-primary"
+               [routerLink]="['/abogado/casos', caso.idRegistro]">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+      <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+
+      <div class="btn-group">
+        <button class="btn btn-outline-secondary"
+          (click)="paginaAnterior()"
+          [disabled]="paginaActual === 1">
+          Anterior
+        </button>
+        <button class="btn btn-outline-secondary"
+          (click)="siguientePagina()"
+          [disabled]="paginaActual === totalPaginas">
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

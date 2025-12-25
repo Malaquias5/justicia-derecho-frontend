@@ -1,0 +1,22 @@
+.casos-list-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.table {
+  font-size: 0.9rem;
+  
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  td, th {
+    vertical-align: middle;
+  }
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+}
