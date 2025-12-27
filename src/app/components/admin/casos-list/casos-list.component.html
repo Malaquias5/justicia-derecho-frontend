@@ -20,12 +20,17 @@
     <div class="card-body">
       <div class="row g-3">
         <div class="col-md-3">
-          <label class="form-label">Número de Caso</label>
-          <input type="text" class="form-control" [(ngModel)]="filtros.numeroCaso" placeholder="CASO-2024-0001">
+          <label class="form-label" for="filtroNumeroCaso">Número de Caso</label>
+          <input
+            id="filtroNumeroCaso"
+            type="text"
+            class="form-control"
+            [(ngModel)]="filtros.numeroCaso"
+            placeholder="CASO-2024-0001">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Estado</label>
-          <select class="form-select" [(ngModel)]="filtros.estado">
+          <label class="form-label" for="filtroEstado">Estado</label>
+          <select id="filtroEstado" class="form-select" [(ngModel)]="filtros.estado">
             <option value="">Todos</option>
             <option value="Pendiente">Pendiente</option>
             <option value="En Proceso">En Proceso</option>
@@ -33,20 +38,28 @@
           </select>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Dependencia</label>
-          <select class="form-select" [(ngModel)]="filtros.dependencia">
+          <label class="form-label" for="filtroDependencia">Dependencia</label>
+          <select id="filtroDependencia" class="form-select" [(ngModel)]="filtros.dependencia">
             <option value="">Todas</option>
             <option value="COMISARIA">COMISARIA</option>
             <option value="FISCALIA">FISCALIA</option>
           </select>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Fecha Desde</label>
-          <input type="date" class="form-control" [(ngModel)]="filtros.fechaDesde">
+          <label class="form-label" for="filtroFechaDesde">Fecha Desde</label>
+          <input
+            id="filtroFechaDesde"
+            type="date"
+            class="form-control"
+            [(ngModel)]="filtros.fechaDesde">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Fecha Hasta</label>
-          <input type="date" class="form-control" [(ngModel)]="filtros.fechaHasta">
+          <label class="form-label" for="filtroFechaHasta">Fecha Hasta</label>
+          <input
+            id="filtroFechaHasta"
+            type="date"
+            class="form-control"
+            [(ngModel)]="filtros.fechaHasta">
         </div>
         <div class="col-md-9 d-flex align-items-end gap-2">
           <button class="btn btn-primary" (click)="aplicarFiltros()">
@@ -68,9 +81,9 @@
 
   <!-- Loading -->
   <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
+    <output class="spinner-border text-primary" aria-live="polite">
       <span class="visually-hidden">Cargando...</span>
-    </div>
+    </output>
   </div>
 
   <!-- Sin resultados -->
@@ -125,6 +138,12 @@
                         [routerLink]="['/admin/casos', caso.idRegistro]"
                         title="Ver detalle">
                   <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-outline-info" 
+                        (click)="cambiarEstado(caso)"
+                        title="Cambiar estado"
+                        *ngIf="caso.estado !== 'Finalizado'">
+                  <i class="bi bi-arrow-repeat"></i>
                 </button>
                 <button class="btn btn-outline-warning" 
                         [routerLink]="['/admin/casos', caso.idRegistro, 'editar']"

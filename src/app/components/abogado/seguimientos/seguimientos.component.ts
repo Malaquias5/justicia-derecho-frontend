@@ -231,11 +231,13 @@ interface Seguimiento {
                     </small>
                   </div>
                   <div class="btn-group btn-group-sm">
-                    <button type="button" class="btn btn-outline-primary" title="Ver detalles">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      title="Ver detalles"
+                      [routerLink]="['/abogado/casos', seguimiento.idCaso]"
+                    >
                       <i class="bi bi-eye"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-warning" title="Editar">
-                      <i class="bi bi-pencil"></i>
                     </button>
                   </div>
                 </div>

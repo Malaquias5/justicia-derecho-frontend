@@ -92,3 +92,29 @@
     }
   }
 }
+
+// Estilos del modal
+.modal {
+  display: block;
+  
+  .modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 500px;
+  }
+  
+  .modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+}

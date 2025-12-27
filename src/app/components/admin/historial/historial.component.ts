@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SeguimientosService } from '../../../core/services/seguimientos.service';
+import { ToastrService } from 'ngx-toastr';
+import { ApiResponse } from '../../../core/models/api-response.model';
 
 interface Cambio {
   id: number;
@@ -35,20 +38,13 @@ interface Cambio {
               <label class="form-label small">Tipo de Acción</label>
               <select class="form-select" [(ngModel)]="filtroAccion" (change)="aplicarFiltros()">
                 <option value="">Todas</option>
-                <option value="Crear">Creación</option>
-                <option value="Editar">Edición</option>
-                <option value="Eliminar">Eliminación</option>
-                <option value="Login">Inicio de Sesión</option>
-                <option value="Logout">Cierre de Sesión</option>
+                <option value="Seguimiento">Seguimientos de Casos</option>
               </select>
             </div>
             <div class="col-md-3">
               <label class="form-label small">Entidad</label>
               <select class="form-select" [(ngModel)]="filtroEntidad" (change)="aplicarFiltros()">
                 <option value="">Todas</option>
-                <option value="Usuario">Usuarios</option>
-                <option value="Caso">Casos</option>
-                <option value="Documento">Documentos</option>
                 <option value="Seguimiento">Seguimientos</option>
               </select>
             </div>
@@ -270,32 +266,50 @@ export class HistorialComponent implements OnInit {
   totalPages = 0;
   Math = Math;
 
+  constructor(
+    private seguimientosService: SeguimientosService,
+    private toastr: ToastrService
+  ) {}
+
   ngOnInit(): void {
-    this.cargarDatosEjemplo();
-    this.calcularEstadisticas();
+    this.cargarHistorial();
   }
 
-  cargarDatosEjemplo(): void {
-    // Datos de ejemplo para demostración
-    const acciones = ['Crear', 'Editar', 'Eliminar', 'Login', 'Logout'];
-    const entidades = ['Usuario', 'Caso', 'Documento', 'Seguimiento'];
-    const usuarios = ['admin', 'juan.perez', 'maria.garcia', 'carlos.lopez'];
-    const roles = ['Admin', 'Abogado', 'Usuario'];
+  cargarHistorial(): void {
+    this.seguimientosService.listarMisSeguimientos().subscribe({
+      next: (response: ApiResponse<any>) => {
+        if (response.success && response.data) {
+          this.cambios = response.data.map((seg: any, index: number) => ({
+            id: seg.idSeguimiento ?? index + 1,
+            fecha: new Date(seg.fechaSeguimiento),
+            usuario: seg.usuarioRegistro || seg.usuario || 'Desconocido',
+            rol: 'Abogado',
+            accion: 'Seguimiento',
+            entidad: 'Seguimiento',
+            detalle: `${seg.tipoMovimiento || 'Movimiento'} en el caso ${seg.numeroCaso || 'N/A'}: ${seg.descripcion || ''}`,
+            ip: undefined,
+          }));
 
-    this.cambios = Array.from({ length: 50 }, (_, i) => ({
-      id: i + 1,
-      fecha: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-      usuario: usuarios[Math.floor(Math.random() * usuarios.length)],
-      rol: roles[Math.floor(Math.random() * roles.length)],
-      accion: acciones[Math.floor(Math.random() * acciones.length)],
-      entidad: entidades[Math.floor(Math.random() * entidades.length)],
-      detalle: `${acciones[Math.floor(Math.random() * acciones.length)]} registro #${Math.floor(Math.random() * 1000)}`,
-      ip: `192.168.1.${Math.floor(Math.random() * 255)}`
-    }));
-
-    this.cambios.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
-    this.cambiosFiltrados = [...this.cambios];
-    this.actualizarPaginacion();
+          this.cambios.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+          this.cambiosFiltrados = [...this.cambios];
+          this.calcularEstadisticas();
+          this.actualizarPaginacion();
+        } else {
+          this.cambios = [];
+          this.cambiosFiltrados = [];
+          this.calcularEstadisticas();
+          this.actualizarPaginacion();
+        }
+      },
+      error: (error: any) => {
+        console.error('Error al cargar historial de cambios:', error);
+        this.toastr.error('Error al cargar el historial de cambios', 'Error');
+        this.cambios = [];
+        this.cambiosFiltrados = [];
+        this.calcularEstadisticas();
+        this.actualizarPaginacion();
+      },
+    });
   }
 
   calcularEstadisticas(): void {
@@ -344,6 +358,7 @@ export class HistorialComponent implements OnInit {
 
   getAccionClass(accion: string): string {
     switch (accion) {
+      case 'Seguimiento': return 'bg-info';
       case 'Crear': return 'bg-success';
       case 'Editar': return 'bg-warning text-dark';
       case 'Eliminar': return 'bg-danger';
@@ -355,6 +370,7 @@ export class HistorialComponent implements OnInit {
 
   getAccionIcon(accion: string): string {
     switch (accion) {
+      case 'Seguimiento': return 'bi bi-card-list';
       case 'Crear': return 'bi bi-plus-circle';
       case 'Editar': return 'bi bi-pencil';
       case 'Eliminar': return 'bi bi-trash';

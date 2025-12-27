@@ -6,13 +6,19 @@ import { ApiResponse } from '../models/api-response.model';
 import { Documento, DocumentoRequest } from '../models/documento.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DocumentosService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/abogado/documentos`;
 
-  subirDocumento(documento: DocumentoRequest): Observable<ApiResponse<Documento>> {
+  subirDocumento(documento: DocumentoRequest | FormData): Observable<ApiResponse<Documento>> {
+    // Si ya viene como FormData, usarlo directamente
+    if (documento instanceof FormData) {
+      return this.http.post<ApiResponse<Documento>>(this.apiUrl, documento);
+    }
+
+    // Si no, crear el FormData
     const formData = new FormData();
     formData.append('idRegistro', documento.idRegistro.toString());
     formData.append('tipoDocumento', documento.tipoDocumento);
@@ -39,7 +45,7 @@ export class DocumentosService {
 
   descargarDocumento(id: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/${id}/descargar`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
   }
 

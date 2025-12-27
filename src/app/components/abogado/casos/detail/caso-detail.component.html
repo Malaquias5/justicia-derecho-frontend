@@ -67,25 +67,25 @@
           <div class="row g-3">
             <!-- Abogado -->
             <div class="col-md-6">
-              <label class="form-label text-muted fw-semibold mb-1">
+              <p class="form-label text-muted fw-semibold mb-1">
                 <i class="bi bi-person-badge me-1"></i>Abogado:
-              </label>
+              </p>
               <p class="mb-0">{{ caso?.abogado }}</p>
             </div>
 
             <!-- Tipo -->
             <div class="col-md-6">
-              <label class="form-label text-muted fw-semibold mb-1">
+              <p class="form-label text-muted fw-semibold mb-1">
                 <i class="bi bi-tag me-1"></i>Tipo:
-              </label>
+              </p>
               <p class="mb-0">{{ caso?.tipoCaso }}</p>
             </div>
 
             <!-- Dependencia -->
             <div class="col-md-6">
-              <label class="form-label text-muted fw-semibold mb-1">
+              <p class="form-label text-muted fw-semibold mb-1">
                 <i class="bi bi-building me-1"></i>Dependencia:
-              </label>
+              </p>
               <p class="mb-0">
                 <span 
                   class="badge"
@@ -100,25 +100,25 @@
 
             <!-- Ingreso -->
             <div class="col-md-6">
-              <label class="form-label text-muted fw-semibold mb-1">
+              <p class="form-label text-muted fw-semibold mb-1">
                 <i class="bi bi-calendar-check me-1"></i>Ingreso:
-              </label>
+              </p>
               <p class="mb-0">{{ formatDate(caso?.fechaIngreso) }}</p>
             </div>
 
             <!-- Vencimiento -->
             <div class="col-md-6">
-              <label class="form-label text-muted fw-semibold mb-1">
+              <p class="form-label text-muted fw-semibold mb-1">
                 <i class="bi bi-calendar-x me-1"></i>Vencimiento:
-              </label>
+              </p>
               <p class="mb-0">{{ formatDate(caso?.fechaVencimiento) }}</p>
             </div>
 
             <!-- Descripción -->
             <div class="col-12 mt-4">
-              <label class="form-label text-muted fw-semibold mb-2">
+              <p class="form-label text-muted fw-semibold mb-2">
                 <i class="bi bi-file-text me-1"></i>Descripción:
-              </label>
+              </p>
               <div class="alert alert-light mb-0">
                 <p class="mb-0">{{ caso?.opcionLlenado || 'Sin descripción' }}</p>
               </div>
@@ -179,7 +179,8 @@
           </h5>
           <button 
             class="btn btn-light btn-sm"
-            (click)="mostrarModalDocumento()">
+            [routerLink]="['/abogado/documentos']"
+            [queryParams]="{ idRegistro: id }">
             <i class="bi bi-plus-circle me-1"></i>Agregar
           </button>
         </div>
@@ -211,8 +212,8 @@
 </div>
 
 <!-- Modal para agregar seguimiento -->
-<div class="modal fade" id="modalSeguimiento" tabindex="-1" *ngIf="showModalSeguimiento">
-  <div class="modal-dialog">
+<div class="modal fade show" tabindex="-1" *ngIf="showModalSeguimiento" style="display: block;">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-info text-white">
         <h5 class="modal-title">
@@ -223,18 +224,22 @@
       <div class="modal-body">
         <form [formGroup]="seguimientoForm">
           <div class="mb-3">
-            <label class="form-label">Tipo de Movimiento: <span class="text-danger">*</span></label>
-            <select class="form-select" formControlName="tipoMovimiento">
+            <label class="form-label" for="tipoMovimientoSelect">Tipo de Movimiento: <span class="text-danger">*</span></label>
+            <select id="tipoMovimientoSelect" class="form-select" formControlName="tipoMovimiento">
               <option value="">-- Seleccione --</option>
               <option value="Audiencia">Audiencia</option>
               <option value="Presentación de Documentos">Presentación de Documentos</option>
+              <option value="Presentación de Pruebas">Presentación de Pruebas</option>
               <option value="Resolución">Resolución</option>
               <option value="Citación">Citación</option>
+              <option value="Notificación">Notificación</option>
+              <option value="Otro">Otro</option>
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label">Descripción:</label>
+            <label class="form-label" for="descripcionSeguimiento">Descripción:</label>
             <textarea 
+              id="descripcionSeguimiento"
               class="form-control" 
               formControlName="descripcion"
               rows="4"
@@ -251,4 +256,9 @@
     </div>
   </div>
 </div>
-<div class="modal-backdrop fade show" *ngIf="showModalSeguimiento" (click)="cerrarModalSeguimiento()"></div>
+<div
+  class="modal-backdrop fade show"
+  *ngIf="showModalSeguimiento"
+  (click)="cerrarModalSeguimiento()"
+  (keydown.enter)="cerrarModalSeguimiento()"
+></div>

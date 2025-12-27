@@ -26,6 +26,7 @@ export interface CasoRequest {
   tipoCaso: string;
   dependencia: string;
   opcionLlenado?: string;
+  descripcion?: string;
   estado?: string;
 }
 

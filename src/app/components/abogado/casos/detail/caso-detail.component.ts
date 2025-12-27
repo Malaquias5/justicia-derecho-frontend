@@ -12,16 +12,24 @@ import { DocumentosService } from '../../../../core/services/documentos.service'
   standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './caso-detail.component.html',
-  styleUrls: ['./caso-detail.component.scss']
+  styleUrls: ['./caso-detail.component.scss'],
 })
 export class CasoDetailComponent implements OnInit {
-  id!: number;
-  caso: any = null;
-  seguimientos: any[] = [];
-  documentos: any[] = [];
-  showModalSeguimiento = false;
-  seguimientoForm: FormGroup;
-  Math = Math;
+  public id!: number;
+  public caso: any = null;
+  public seguimientos: any[] = [];
+  public documentos: any[] = [];
+
+  // Modales
+  public showModalSeguimiento = false;
+  public showModalDocumento = false;
+
+  // Formularios
+  public seguimientoForm: FormGroup;
+  public documentoForm: FormGroup;
+  public archivoSeleccionado: File | null = null;
+
+  public Math = Math;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,7 +42,12 @@ export class CasoDetailComponent implements OnInit {
   ) {
     this.seguimientoForm = this.fb.group({
       tipoMovimiento: ['', Validators.required],
-      descripcion: ['']
+      descripcion: [''],
+    });
+    this.documentoForm = this.fb.group({
+      tipoDocumento: ['', Validators.required],
+      descripcion: [''],
+      archivo: [null, Validators.required],
     });
   }
 
@@ -59,7 +72,7 @@ export class CasoDetailComponent implements OnInit {
         console.error('Error al cargar caso:', error);
         this.toastr.error('Error al cargar el caso', 'Error');
         this.router.navigate(['/abogado/casos']);
-      }
+      },
     });
   }
 
@@ -72,7 +85,7 @@ export class CasoDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar seguimientos:', error);
-      }
+      },
     });
   }
 
@@ -85,7 +98,7 @@ export class CasoDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar documentos:', error);
-      }
+      },
     });
   }
 
@@ -118,13 +131,36 @@ export class CasoDetailComponent implements OnInit {
         tipoCaso: this.caso.tipoCaso,
         dependencia: this.caso.dependencia,
         opcionLlenado: this.caso.opcionLlenado || '',
+        descripcion: this.caso.descripcion || '',
         estado: nuevoEstado,
       };
 
       this.casosService.actualizarCaso(this.id, casoActualizado).subscribe({
         next: (response) => {
-          this.toastr.success('Estado actualizado correctamente', 'Éxito');
-          this.cargarCaso();
+          if (response.success) {
+            // Crear seguimiento automático del cambio de estado
+            const seguimientoCambioEstado = {
+              idRegistro: this.id,
+              tipoMovimiento: 'Cambio de Estado',
+              descripcion: `Estado cambiado de "${estadoActual}" a "${nuevoEstado}"`,
+            };
+
+            this.seguimientosService.crearSeguimiento(seguimientoCambioEstado).subscribe({
+              next: () => {
+                this.toastr.success('Estado actualizado correctamente', 'Éxito');
+                this.cargarCaso();
+                this.cargarSeguimientos();
+              },
+              error: (error) => {
+                console.error('Error al crear seguimiento:', error);
+                this.toastr.success('Estado actualizado (sin registro en historial)', 'Éxito');
+                this.cargarCaso();
+                this.cargarSeguimientos();
+              },
+            });
+          } else {
+            this.toastr.error('Error al actualizar el estado', 'Error');
+          }
         },
         error: (error) => {
           console.error('Error al actualizar estado:', error);
@@ -154,7 +190,7 @@ export class CasoDetailComponent implements OnInit {
     const seguimiento = {
       idRegistro: this.id,
       tipoMovimiento: this.seguimientoForm.value.tipoMovimiento,
-      descripcion: this.seguimientoForm.value.descripcion || ''
+      descripcion: this.seguimientoForm.value.descripcion || '',
     };
 
     this.seguimientosService.crearSeguimiento(seguimiento).subscribe({
@@ -166,12 +202,81 @@ export class CasoDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error al guardar seguimiento:', error);
         this.toastr.error('Error al guardar el seguimiento', 'Error');
-      }
+      },
     });
   }
 
   mostrarModalDocumento(): void {
-    this.toastr.info('Funcionalidad en desarrollo', 'Información');
+    this.showModalDocumento = true;
+    this.documentoForm.reset();
+    this.archivoSeleccionado = null;
+    document.body.classList.add('modal-open');
+  }
+
+  cerrarModalDocumento(): void {
+    this.showModalDocumento = false;
+    this.documentoForm.reset();
+    this.archivoSeleccionado = null;
+    document.body.classList.remove('modal-open');
+  }
+
+  onArchivoSeleccionado(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validar tamaño (máximo 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        this.toastr.error('El archivo no debe superar 10MB', 'Error');
+        event.target.value = '';
+        return;
+      }
+
+      // Validar tipo de archivo
+      const tiposPermitidos = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'image/jpeg',
+        'image/png',
+      ];
+
+      if (!tiposPermitidos.includes(file.type)) {
+        this.toastr.error('Solo se permiten archivos PDF, Word o imágenes', 'Error');
+        event.target.value = '';
+        return;
+      }
+
+      this.archivoSeleccionado = file;
+      this.documentoForm.patchValue({ archivo: file });
+    }
+  }
+
+  guardarDocumento(): void {
+    if (this.documentoForm.invalid || !this.archivoSeleccionado) {
+      this.toastr.warning('Complete todos los campos y seleccione un archivo', 'Validación');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('idRegistro', this.id.toString());
+    formData.append('tipoDocumento', this.documentoForm.value.tipoDocumento);
+    formData.append('descripcion', this.documentoForm.value.descripcion || '');
+    formData.append('archivo', this.archivoSeleccionado);
+
+    this.documentosService.subirDocumento(formData).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toastr.success('Documento subido correctamente', 'Éxito');
+          this.cerrarModalDocumento();
+          this.cargarDocumentos();
+        } else {
+          this.toastr.error('Error al subir el documento', 'Error');
+        }
+      },
+      error: (error) => {
+        console.error('Error al guardar documento:', error);
+        this.toastr.error('Error al subir el documento', 'Error');
+      },
+    });
   }
 
   formatDate(date: string | Date, includeTime: boolean = false): string {
@@ -180,13 +285,13 @@ export class CasoDetailComponent implements OnInit {
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    
+
     if (includeTime) {
       const hours = String(d.getHours()).padStart(2, '0');
       const minutes = String(d.getMinutes()).padStart(2, '0');
       return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
-    
+
     return `${day}/${month}/${year}`;
   }
 
@@ -195,6 +300,7 @@ export class CasoDetailComponent implements OnInit {
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 }
+

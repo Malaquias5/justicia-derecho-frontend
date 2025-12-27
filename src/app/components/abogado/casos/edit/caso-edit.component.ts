@@ -78,26 +78,36 @@ export class CasoEditComponent implements OnInit {
 
     this.isLoading = true;
 
-    // Construir el objeto completo con todos los campos
-    // Mandamos todos los datos, pero solo los editables habrán cambiado
+    // Construir el objeto completo con TODOS los campos requeridos
     const casoActualizado = {
-      ...this.caso,
+      abogado: this.caso.abogado,
       patrocinado: this.casoForm.value.patrocinado,
-      opcionLlenado: this.casoForm.value.opcionLlenado
+      numeroCaso: this.caso.numeroCaso,
+      fechaIngreso: this.caso.fechaIngreso,
+      fechaVencimiento: this.caso.fechaVencimiento,
+      tipoCaso: this.caso.tipoCaso,
+      dependencia: this.caso.dependencia,
+      opcionLlenado: this.casoForm.value.opcionLlenado || '',
+      descripcion: this.caso.descripcion || '',
+      estado: this.caso.estado,
     };
 
     this.casosService.actualizarCaso(this.id, casoActualizado).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.toastr.success('Caso actualizado exitosamente', 'Éxito');
-        this.router.navigate(['/abogado/casos', this.id]);
+        if (response.success) {
+          this.toastr.success('Caso actualizado exitosamente', 'Éxito');
+          this.router.navigate(['/abogado/casos', this.id]);
+        } else {
+          this.toastr.error('Error al actualizar caso', 'Error');
+        }
       },
       error: (error) => {
         this.isLoading = false;
         console.error('Error al actualizar:', error);
         const errorMessage = error.error?.message || 'Error al actualizar caso';
         this.toastr.error(errorMessage, 'Error');
-      }
+      },
     });
   }
 
