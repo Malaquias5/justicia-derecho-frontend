@@ -146,8 +146,19 @@ export class CasosListComponent implements OnInit {
     }
 
     if (confirm(`¿Cambiar estado de "${estadoActual}" a "${nuevoEstado}"?`)) {
-      const casoActualizado = { ...caso, estado: nuevoEstado as any };
-      
+      // Enviar solo los campos necesarios que espera el backend
+      const casoActualizado = {
+        abogado: caso.abogado,
+        patrocinado: caso.patrocinado,
+        numeroCaso: caso.numeroCaso,
+        fechaIngreso: caso.fechaIngreso,
+        fechaVencimiento: caso.fechaVencimiento,
+        tipoCaso: caso.tipoCaso,
+        dependencia: caso.dependencia,
+        opcionLlenado: caso.opcionLlenado || '',
+        estado: nuevoEstado,
+      };
+
       this.casosService.actualizarCaso(caso.idRegistro, casoActualizado).subscribe({
         next: (response) => {
           this.toastr.success('Estado actualizado correctamente', 'Éxito');

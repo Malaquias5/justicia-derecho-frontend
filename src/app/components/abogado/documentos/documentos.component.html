@@ -1,0 +1,222 @@
+<div class="documentos-container p-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h2 class="h4 mb-2">
+      <i class="bi bi-file-earmark-text me-2"></i>Gestión de Documentos
+    </h2>
+    <p class="text-muted mb-0">Administra todos los documentos de los casos judiciales</p>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h3 class="display-6 fw-bold text-primary mb-1">{{ totalDocumentos }}</h3>
+              <p class="text-muted mb-0 small">Total Documentos</p>
+            </div>
+            <i class="bi bi-files text-primary" style="font-size: 2.5rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h3 class="display-6 fw-bold text-success mb-1">{{ documentosHoy }}</h3>
+              <p class="text-muted mb-0 small">Subidos Hoy</p>
+            </div>
+            <i class="bi bi-upload text-success" style="font-size: 2.5rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h3 class="display-6 fw-bold text-info mb-1">{{ formatBytes(espacioUsado) }}</h3>
+              <p class="text-muted mb-0 small">Espacio Usado</p>
+            </div>
+            <i class="bi bi-hdd text-info" style="font-size: 2.5rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h3 class="display-6 fw-bold text-warning mb-1">0</h3>
+              <p class="text-muted mb-0 small">Pendientes</p>
+            </div>
+            <i class="bi bi-clock text-warning" style="font-size: 2.5rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="bi bi-folder2-open me-2"></i>Documentos Recientes
+        </h5>
+        <button class="btn btn-primary" (click)="abrirModalSubir()">
+          <i class="bi bi-cloud-upload me-2"></i>Subir Documento
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Loading -->
+      <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3 text-muted">Cargando documentos...</p>
+      </div>
+
+      <!-- Sin documentos -->
+      <div *ngIf="!cargando && documentos.length === 0" class="text-center py-5">
+        <i class="bi bi-inbox" style="font-size: 4rem; color: #6c757d; opacity: 0.3;"></i>
+        <h5 class="mt-4 mb-2">No hay documentos</h5>
+        <p class="text-muted mb-4">
+          Comienza subiendo tu primer documento relacionado con un caso.
+        </p>
+        <button class="btn btn-primary" (click)="abrirModalSubir()">
+          <i class="bi bi-cloud-upload me-2"></i>Subir Primer Documento
+        </button>
+      </div>
+
+      <!-- Tabla de documentos -->
+      <div *ngIf="!cargando && documentos.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th><i class="bi bi-file-earmark me-1"></i>Nombre</th>
+              <th><i class="bi bi-tag me-1"></i>Tipo</th>
+              <th><i class="bi bi-hdd me-1"></i>Tamaño</th>
+              <th><i class="bi bi-calendar me-1"></i>Fecha de Carga</th>
+              <th><i class="bi bi-person me-1"></i>Usuario</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let doc of documentos">
+              <td>
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-file-earmark-pdf text-danger me-2" style="font-size: 1.5rem;"></i>
+                  <div>
+                    <div class="fw-semibold">{{ doc.nombreArchivo }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-primary">{{ doc.tipoDocumento }}</span>
+              </td>
+              <td>{{ formatBytes(doc.tamanoBytes) }}</td>
+              <td>{{ formatDate(doc.fechaCarga) }}</td>
+              <td>{{ doc.usuarioCarga }}</td>
+              <td class="text-end">
+                <button 
+                  class="btn btn-sm btn-outline-primary me-2"
+                  (click)="descargarDocumento(doc)"
+                  title="Descargar">
+                  <i class="bi bi-download"></i>
+                </button>
+                <button 
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="eliminarDocumento(doc)"
+                  title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para subir documento -->
+  <div class="modal fade" [class.show]="mostrarModal" [style.display]="mostrarModal ? 'block' : 'none'" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-cloud-upload me-2"></i>Subir Documento
+          </h5>
+          <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label class="form-label">Caso Relacionado <span class="text-danger">*</span></label>
+              <select class="form-select" [(ngModel)]="nuevoDocumento.casoId" name="caso">
+                <option [value]="0">-- Selecciona un caso --</option>
+                <option *ngFor="let caso of casos" [value]="caso.idRegistro">
+                  {{ caso.numeroCaso }} - {{ caso.patrocinado }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
+              <select class="form-select" [(ngModel)]="nuevoDocumento.tipo" name="tipo">
+                <option value="">-- Selecciona un tipo --</option>
+                <option value="Escrito">Escrito</option>
+                <option value="Acta">Acta</option>
+                <option value="Sentencia">Sentencia</option>
+                <option value="Resolución">Resolución</option>
+                <option value="Prueba">Prueba</option>
+                <option value="Notificación">Notificación</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Archivo <span class="text-danger">*</span></label>
+              <input 
+                type="file" 
+                class="form-control" 
+                (change)="onFileSelected($event)"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+              <small class="text-muted">Formatos: PDF, Word, Imágenes (Max 10MB)</small>
+            </div>
+
+            <div class="mb-3" *ngIf="archivoSeleccionado">
+              <div class="alert alert-info mb-0">
+                <i class="bi bi-file-earmark-check me-2"></i>
+                <strong>{{ archivoSeleccionado.name }}</strong> 
+                ({{ (archivoSeleccionado.size / 1024 / 1024).toFixed(2) }} MB)
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+            <i class="bi bi-x-circle me-2"></i>Cancelar
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="subirDocumento()"
+            [disabled]="!nuevoDocumento.tipo || !archivoSeleccionado || nuevoDocumento.casoId === 0 || cargando">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!cargando" class="bi bi-upload me-2"></i>
+            {{ cargando ? 'Subiendo...' : 'Subir Documento' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade" [class.show]="mostrarModal" *ngIf="mostrarModal"></div>
+</div>

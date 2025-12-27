@@ -90,6 +90,11 @@ export class CasoDetailComponent implements OnInit {
   }
 
   cambiarEstado(): void {
+    if (!this.caso) {
+      this.toastr.error('No se ha cargado el caso', 'Error');
+      return;
+    }
+
     const estadoActual = this.caso.estado;
     let nuevoEstado: string;
 
@@ -103,8 +108,19 @@ export class CasoDetailComponent implements OnInit {
     }
 
     if (confirm(`¿Cambiar estado de "${estadoActual}" a "${nuevoEstado}"?`)) {
-      const casoActualizado = { ...this.caso, estado: nuevoEstado };
-      
+      // Enviar solo los campos necesarios que espera el backend
+      const casoActualizado = {
+        abogado: this.caso.abogado,
+        patrocinado: this.caso.patrocinado,
+        numeroCaso: this.caso.numeroCaso,
+        fechaIngreso: this.caso.fechaIngreso,
+        fechaVencimiento: this.caso.fechaVencimiento,
+        tipoCaso: this.caso.tipoCaso,
+        dependencia: this.caso.dependencia,
+        opcionLlenado: this.caso.opcionLlenado || '',
+        estado: nuevoEstado,
+      };
+
       this.casosService.actualizarCaso(this.id, casoActualizado).subscribe({
         next: (response) => {
           this.toastr.success('Estado actualizado correctamente', 'Éxito');
@@ -113,7 +129,7 @@ export class CasoDetailComponent implements OnInit {
         error: (error) => {
           console.error('Error al actualizar estado:', error);
           this.toastr.error('Error al actualizar el estado', 'Error');
-        }
+        },
       });
     }
   }
@@ -136,8 +152,9 @@ export class CasoDetailComponent implements OnInit {
     }
 
     const seguimiento = {
-      idCaso: this.id,
-      ...this.seguimientoForm.value
+      idRegistro: this.id,
+      tipoMovimiento: this.seguimientoForm.value.tipoMovimiento,
+      descripcion: this.seguimientoForm.value.descripcion || ''
     };
 
     this.seguimientosService.crearSeguimiento(seguimiento).subscribe({
