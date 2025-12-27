@@ -52,10 +52,20 @@ export class CasoDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.cargarCaso();
-    this.cargarSeguimientos();
-    this.cargarDocumentos();
+    this.route.paramMap.subscribe((params) => {
+      const idParam = params.get('id');
+
+      if (!idParam) {
+        this.toastr.error('Identificador de caso no válido', 'Error');
+        this.router.navigate(['/abogado/casos']);
+        return;
+      }
+
+      this.id = Number(idParam);
+      this.cargarCaso();
+      this.cargarSeguimientos();
+      this.cargarDocumentos();
+    });
   }
 
   cargarCaso(): void {

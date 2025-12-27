@@ -160,12 +160,6 @@ export class SidebarComponent implements OnInit {
         route: '/admin/casos',
         roles: ['Admin'],
       },
-      {
-        label: 'Seguimientos',
-        icon: 'pi pi-list',
-        route: '/abogado/seguimientos',
-        roles: ['Admin'],
-      },
 
       // Abogado menu
       {
@@ -208,40 +202,8 @@ export class SidebarComponent implements OnInit {
         route: '/abogado/seguimientos',
         roles: ['Abogado'],
       },
-      {
-        label: 'Calendario',
-        icon: 'pi pi-calendar',
-        route: '/abogado/calendario',
-        roles: ['Abogado'],
-        badge: 2,
-        badgeSeverity: 'info',
-      },
 
-      // Usuario menu
-      {
-        label: 'Mis Casos',
-        icon: 'pi pi-folder',
-        route: '/usuario/mis-casos',
-        roles: ['Usuario'],
-      },
-      {
-        label: 'Seguimiento',
-        icon: 'pi pi-eye',
-        route: '/usuario/seguimiento',
-        roles: ['Usuario'],
-      },
-      {
-        label: 'Configuración',
-        icon: 'pi pi-cog',
-        route: '/usuario/configuracion',
-        roles: ['Usuario'],
-      },
-      {
-        label: 'Ayuda',
-        icon: 'pi pi-question-circle',
-        route: '/usuario/ayuda',
-        roles: ['Usuario'],
-      },
+      // (Opciones de menú para rol Usuario eliminadas)
     ];
   }
 

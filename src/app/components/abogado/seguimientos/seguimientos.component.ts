@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { SeguimientosService } from '../../../core/services/seguimientos.service';
+import { CasosService } from '../../../core/services/casos.service';
 import { ToastrService } from 'ngx-toastr';
 import { ApiResponse } from '../../../core/models/api-response.model';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Seguimiento {
   id: number;
@@ -74,8 +76,8 @@ interface Seguimiento {
         </div>
       </div>
 
-      <!-- Formulario nuevo seguimiento -->
-      <div class="card border-0 shadow-sm mb-4" *ngIf="mostrarFormulario">
+      <!-- Formulario nuevo seguimiento (solo para abogado) -->
+      <div class="card border-0 shadow-sm mb-4" *ngIf="mostrarFormulario && !esAdmin">
         <div class="card-header bg-primary text-white">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Nuevo Seguimiento</h5>
@@ -155,29 +157,19 @@ interface Seguimiento {
         </div>
       </div>
 
-      <!-- Botón para mostrar formulario -->
-      <div class="mb-4" *ngIf="!mostrarFormulario">
+      <!-- Botón para mostrar formulario (solo para abogado) -->
+      <div class="mb-4" *ngIf="!mostrarFormulario && !esAdmin">
         <button type="button" class="btn btn-primary" (click)="mostrarFormulario = true">
           <i class="bi bi-plus-circle me-2"></i>Nuevo Seguimiento
         </button>
       </div>
 
-      <!-- Filtros -->
-      <div class="card border-0 shadow-sm mb-4">
+      <!-- Filtros (solo para abogado) -->
+      <div class="card border-0 shadow-sm mb-4" *ngIf="!esAdmin">
         <div class="card-body">
           <div class="row g-3">
-            <div class="col-md-4">
-              <label class="form-label small">Buscar por Caso</label>
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="filtroCaso"
-                (input)="aplicarFiltros()"
-                placeholder="Número de caso..."
-              />
-            </div>
-            <div class="col-md-4">
-              <label class="form-label small">Tipo</label>
+            <div class="col-md-6 col-lg-4">
+              <label class="form-label small">Tipo de Seguimiento</label>
               <select class="form-select" [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
                 <option value="">Todos</option>
                 <option value="Audiencia">Audiencia</option>
@@ -187,15 +179,6 @@ interface Seguimiento {
                 <option value="Diligencia">Diligencia</option>
                 <option value="Otro">Otro</option>
               </select>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label small">Fecha</label>
-              <input
-                type="date"
-                class="form-control"
-                [(ngModel)]="filtroFecha"
-                (change)="aplicarFiltros()"
-              />
             </div>
           </div>
         </div>
@@ -377,6 +360,9 @@ export class SeguimientosComponent implements OnInit {
   filtroTipo = '';
   filtroFecha = '';
 
+  // Rol
+  esAdmin = false;
+
   // Formulario
   mostrarFormulario = false;
   nuevoSeguimiento: any = {
@@ -392,13 +378,21 @@ export class SeguimientosComponent implements OnInit {
   totalPages = 0;
   Math = Math;
 
-  constructor(private seguimientosService: SeguimientosService, private toastr: ToastrService) {}
+  constructor(
+    private readonly seguimientosService: SeguimientosService,
+    private readonly casosService: CasosService,
+    private readonly toastr: ToastrService,
+    private readonly authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+    this.esAdmin = this.authService.isAdmin();
     this.cargarSeguimientos();
   }
 
   cargarSeguimientos(): void {
+    // Usamos siempre el endpoint estable de "mis seguimientos" para
+    // evitar errores cuando el backend no expone el historial global.
     this.seguimientosService.listarMisSeguimientos().subscribe({
       next: (response: ApiResponse<any>) => {
         if (response.success && response.data) {
@@ -407,8 +401,8 @@ export class SeguimientosComponent implements OnInit {
             idCaso: seg.idRegistro,
             numeroCaso: seg.numeroCaso || 'N/A',
             fecha: new Date(seg.fechaSeguimiento),
-            usuario: seg.usuario || 'Usuario',
-            tipo: seg.tipoSeguimiento || 'General',
+            usuario: seg.usuarioRegistro || seg.usuario || 'Usuario',
+            tipo: seg.tipoMovimiento || 'General',
             descripcion: seg.descripcion || '',
             documentos: 0,
           }));
@@ -495,27 +489,39 @@ export class SeguimientosComponent implements OnInit {
       );
       return;
     }
-
-    // Buscar el caso por número para obtener el idRegistro
-    const seguimientoData: any = {
-      numeroCaso: this.nuevoSeguimiento.numeroCaso,
-      tipoMovimiento: this.nuevoSeguimiento.tipo,
-      descripcion: this.nuevoSeguimiento.descripcion,
-    };
-
-    this.seguimientosService.crearSeguimiento(seguimientoData).subscribe({
-      next: (response: ApiResponse<any>) => {
-        if (response.success) {
-          this.toastr.success('Seguimiento guardado exitosamente', 'Éxito');
-          this.cancelarFormulario();
-          this.cargarSeguimientos(); // Recargar la lista
-        } else {
-          this.toastr.error(response.message || 'Error al guardar seguimiento', 'Error');
+    // Primero obtener el caso por número para conocer su idRegistro
+    this.casosService.obtenerCasoPorNumero(this.nuevoSeguimiento.numeroCaso).subscribe({
+      next: (casoResponse) => {
+        if (!casoResponse.success || !casoResponse.data) {
+          this.toastr.error('No se encontró un caso con ese número', 'Caso no encontrado');
+          return;
         }
+
+        const seguimientoData: any = {
+          idRegistro: casoResponse.data.idRegistro,
+          tipoMovimiento: this.nuevoSeguimiento.tipo,
+          descripcion: this.nuevoSeguimiento.descripcion,
+        };
+
+        this.seguimientosService.crearSeguimiento(seguimientoData).subscribe({
+          next: (response: ApiResponse<any>) => {
+            if (response.success) {
+              this.toastr.success('Seguimiento guardado exitosamente', 'Éxito');
+              this.cancelarFormulario();
+              this.cargarSeguimientos(); // Recargar la lista
+            } else {
+              this.toastr.error(response.message || 'Error al guardar seguimiento', 'Error');
+            }
+          },
+          error: (error: any) => {
+            console.error('Error al guardar seguimiento:', error);
+            this.toastr.error('Error al guardar el seguimiento', 'Error');
+          },
+        });
       },
-      error: (error: any) => {
-        console.error('Error al guardar seguimiento:', error);
-        this.toastr.error('Error al guardar el seguimiento', 'Error');
+      error: (error) => {
+        console.error('Error al buscar caso por número:', error);
+        this.toastr.error('No se pudo encontrar el caso indicado', 'Error');
       },
     });
   }

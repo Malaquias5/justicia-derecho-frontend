@@ -7,17 +7,9 @@ export const environment = {
   roles: {
     admin: 'Admin',
     abogado: 'Abogado',
-    usuario: 'Usuario'
   },
-  estadosCaso: [
-    'Pendiente',
-    'En Proceso',
-    'Finalizado'
-  ],
-  dependencias: [
-    'COMISARIA',
-    'FISCALIA'
-  ],
+  estadosCaso: ['Pendiente', 'En Proceso', 'Finalizado'],
+  dependencias: ['COMISARIA', 'FISCALIA'],
   tiposCaso: [
     'Violencia Familiar',
     'Pensión de Alimentos',
@@ -26,6 +18,6 @@ export const environment = {
     'Violación',
     'Robo',
     'Estafa',
-    'Homicidio'
-  ]
+    'Homicidio',
+  ],
 };

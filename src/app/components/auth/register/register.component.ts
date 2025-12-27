@@ -8,12 +8,9 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
   registerForm: FormGroup;
@@ -23,7 +20,7 @@ export class RegisterComponent {
 
   roles = [
     { label: 'Abogado', value: 'Abogado' },
-    { label: 'Usuario', value: 'Usuario' }
+    { label: 'Administrador', value: 'Admin' },
   ];
 
   constructor(
@@ -32,19 +29,21 @@ export class RegisterComponent {
     private router: Router,
     private toastr: ToastrService
   ) {
-    this.registerForm = this.fb.group({
-      usuario: ['', [Validators.required, Validators.minLength(3)]],
-      nombreCompleto: ['', [Validators.required, Validators.minLength(5)]],
-      email: ['', [Validators.required, Validators.email]],
-      rol: ['Usuario', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validator: this.passwordMatchValidator });
+    this.registerForm = this.fb.group(
+      {
+        usuario: ['', [Validators.required, Validators.minLength(3)]],
+        nombreCompleto: ['', [Validators.required, Validators.minLength(5)]],
+        email: ['', [Validators.required, Validators.email]],
+        rol: ['Abogado', [Validators.required]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validator: this.passwordMatchValidator }
+    );
   }
 
   passwordMatchValidator(g: FormGroup) {
-    return g.get('password')?.value === g.get('confirmPassword')?.value
-      ? null : { mismatch: true };
+    return g.get('password')?.value === g.get('confirmPassword')?.value ? null : { mismatch: true };
   }
 
   onSubmit(): void {
@@ -69,7 +68,7 @@ export class RegisterComponent {
       },
       complete: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -82,10 +81,22 @@ export class RegisterComponent {
   }
 
   // Getters para fácil acceso
-  get usuario() { return this.registerForm.get('usuario'); }
-  get nombreCompleto() { return this.registerForm.get('nombreCompleto'); }
-  get email() { return this.registerForm.get('email'); }
-  get rol() { return this.registerForm.get('rol'); }
-  get password() { return this.registerForm.get('password'); }
-  get confirmPassword() { return this.registerForm.get('confirmPassword'); }
+  get usuario() {
+    return this.registerForm.get('usuario');
+  }
+  get nombreCompleto() {
+    return this.registerForm.get('nombreCompleto');
+  }
+  get email() {
+    return this.registerForm.get('email');
+  }
+  get rol() {
+    return this.registerForm.get('rol');
+  }
+  get password() {
+    return this.registerForm.get('password');
+  }
+  get confirmPassword() {
+    return this.registerForm.get('confirmPassword');
+  }
 }

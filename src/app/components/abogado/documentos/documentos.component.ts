@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DocumentosService } from '../../../core/services/documentos.service';
 import { CasosService } from '../../../core/services/casos.service';
@@ -11,9 +10,9 @@ import { Caso } from '../../../core/models/caso.model';
 @Component({
   selector: 'app-documentos',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './documentos.component.html',
-  styleUrls: ['./documentos.component.scss']
+  styleUrls: ['./documentos.component.scss'],
 })
 export class DocumentosComponent implements OnInit {
   mostrarModal = false;
@@ -59,7 +58,7 @@ export class DocumentosComponent implements OnInit {
         console.error('Error al cargar documentos:', error);
         this.toastr.error('Error al cargar los documentos', 'Error');
         this.cargando = false;
-      }
+      },
     });
   }
 
@@ -72,7 +71,7 @@ export class DocumentosComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar casos:', error);
-      }
+      },
     });
   }
 
@@ -115,7 +114,10 @@ export class DocumentosComponent implements OnInit {
 
   subirDocumento(): void {
     if (!this.nuevoDocumento.tipo || !this.archivoSeleccionado) {
-      this.toastr.warning('Por favor completa el tipo de documento y selecciona un archivo', 'Validación');
+      this.toastr.warning(
+        'Por favor completa el tipo de documento y selecciona un archivo',
+        'Validación'
+      );
       return;
     }
 
@@ -129,7 +131,7 @@ export class DocumentosComponent implements OnInit {
     const documentoRequest = {
       idRegistro: this.nuevoDocumento.casoId,
       tipoDocumento: this.nuevoDocumento.tipo,
-      archivo: this.archivoSeleccionado
+      archivo: this.archivoSeleccionado,
     };
 
     this.documentosService.subirDocumento(documentoRequest).subscribe({
@@ -147,7 +149,7 @@ export class DocumentosComponent implements OnInit {
         console.error('Error al subir documento:', error);
         this.toastr.error('Error al subir el documento', 'Error');
         this.cargando = false;
-      }
+      },
     });
   }
 
@@ -167,7 +169,7 @@ export class DocumentosComponent implements OnInit {
       error: (error) => {
         console.error('Error al descargar:', error);
         this.toastr.error('Error al descargar el documento', 'Error');
-      }
+      },
     });
   }
 
@@ -181,7 +183,7 @@ export class DocumentosComponent implements OnInit {
         error: (error) => {
           console.error('Error al eliminar:', error);
           this.toastr.error('Error al eliminar el documento', 'Error');
-        }
+        },
       });
     }
   }

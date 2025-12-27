@@ -10,30 +10,27 @@ import { EstadisticasResponse } from '../../../core/models/estadistica.model';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './estadisticas.component.html',
-  styleUrls: ['./estadisticas.component.scss']
+  styleUrls: ['./estadisticas.component.scss'],
 })
 export class EstadisticasComponent implements OnInit {
   estadisticas: EstadisticasResponse | null = null;
   periodo = '30';
-  
+
   chartData: any;
   chartOptions = {
     plugins: {
       legend: {
-        display: false
-      }
+        display: false,
+      },
     },
     scales: {
       y: {
-        beginAtZero: true
-      }
-    }
+        beginAtZero: true,
+      },
+    },
   };
 
-  constructor(
-    private estadisticasService: EstadisticasService,
-    private toastr: ToastrService
-  ) {}
+  constructor(private estadisticasService: EstadisticasService, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     this.cargarEstadisticas();
@@ -49,15 +46,22 @@ export class EstadisticasComponent implements OnInit {
       },
       error: (error) => {
         this.toastr.error('Error al cargar estadísticas', 'Error');
-      }
+      },
     });
+  }
+
+  get maxCasosAbogado(): number {
+    if (!this.estadisticas?.estadisticasAbogados?.length) {
+      return 0;
+    }
+    return Math.max(...this.estadisticas.estadisticasAbogados.map((e) => e.totalCasos));
   }
 
   actualizarChart(): void {
     if (!this.estadisticas?.estadisticasAbogados) return;
 
-    const abogados = this.estadisticas.estadisticasAbogados.map(e => e.abogado);
-    const totales = this.estadisticas.estadisticasAbogados.map(e => e.totalCasos);
+    const abogados = this.estadisticas.estadisticasAbogados.map((e) => e.abogado);
+    const totales = this.estadisticas.estadisticasAbogados.map((e) => e.totalCasos);
 
     this.chartData = {
       labels: abogados,
@@ -67,15 +71,9 @@ export class EstadisticasComponent implements OnInit {
           data: totales,
           backgroundColor: '#36A2EB',
           borderColor: '#1E88E5',
-          borderWidth: 1
-        }
-      ]
+          borderWidth: 1,
+        },
+      ],
     };
-  }
-
-  getEficiencia(estadistica: any): number {
-    if (estadistica.totalCasos === 0) return 0;
-    const eficiencia = (estadistica.casosFinalizados / estadistica.totalCasos) * 100;
-    return Math.round(eficiencia);
   }
 }

@@ -11,6 +11,8 @@ import { Seguimiento, SeguimientoRequest } from '../models/seguimiento.model';
 export class SeguimientosService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/abogado/seguimientos`;
+  // Historial global de seguimientos del administrador (bajo el mismo prefijo /api)
+  private adminHistorialUrl = `${environment.apiUrl}/admin/historial/seguimientos`;
 
   crearSeguimiento(seguimiento: any): Observable<ApiResponse<Seguimiento>> {
     return this.http.post<ApiResponse<Seguimiento>>(this.apiUrl, seguimiento);
@@ -33,6 +35,11 @@ export class SeguimientosService {
 
   listarSeguimientosPorCaso(idRegistro: number): Observable<ApiResponse<Seguimiento[]>> {
     return this.http.get<ApiResponse<Seguimiento[]>>(`${this.apiUrl}/registro/${idRegistro}`);
+  }
+
+  // Historial global de seguimientos para el administrador
+  listarSeguimientosAdmin(): Observable<ApiResponse<Seguimiento[]>> {
+    return this.http.get<ApiResponse<Seguimiento[]>>(this.adminHistorialUrl);
   }
 
   listarMisSeguimientos(): Observable<ApiResponse<Seguimiento[]>> {

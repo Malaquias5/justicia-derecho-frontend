@@ -87,8 +87,30 @@
   <!-- Gráficos -->
   <div class="row mb-4">
     <div class="col-md-8 mb-3">
-      <div class="card">
-        <canvas></canvas>
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0">Casos por abogado</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="estadisticas?.estadisticasAbogados?.length; else sinDatosAbogados">
+            <div class="mb-3" *ngFor="let e of estadisticas!.estadisticasAbogados">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="fw-semibold">{{ e.abogado }}</span>
+                <span class="text-muted">{{ e.totalCasos }} casos</span>
+              </div>
+              <div class="progress" style="height: 12px;">
+                <div
+                  class="progress-bar bg-primary"
+                  role="progressbar"
+                  [style.width.%]="maxCasosAbogado ? (e.totalCasos / maxCasosAbogado) * 100 : 0"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <ng-template #sinDatosAbogados>
+            <p class="text-muted mb-0">No hay estadísticas de abogados para el período seleccionado.</p>
+          </ng-template>
+        </div>
       </div>
     </div>
     <div class="col-md-4 mb-3">
@@ -111,52 +133,4 @@
     </div>
   </div>
 
-  <!-- Tabla de estadísticas por abogado -->
-  <div class="card">
-    <div class="card-header">
-      <h5 class="mb-0">Rendimiento por Abogado</h5>
-    </div>
-    <div class="card-body">
-      <table class="table">
-        <ng-template>
-          <tr>
-            <th>Abogado</th>
-            <th>Total Casos</th>
-            <th>Pendientes</th>
-            <th>En Proceso</th>
-            <th>Finalizados</th>
-            <th>Vencidos</th>
-            <th>Eficiencia</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-estadistica>
-          <tr>
-            <td class="fw-semibold">{{ estadistica.abogado }}</td>
-            <td>{{ estadistica.totalCasos }}</td>
-            <td>
-              <span class="badge bg-warning">{{ estadistica.casosPendientes }}</span>
-            </td>
-            <td>
-              <span class="badge bg-info">{{ estadistica.casosEnProceso }}</span>
-            </td>
-            <td>
-              <span class="badge bg-success">{{ estadistica.casosFinalizados }}</span>
-            </td>
-            <td>
-              <span class="badge bg-danger">{{ estadistica.casosVencidos }}</span>
-            </td>
-            <td>
-              <span [ngClass]="{
-                'text-success fw-bold': getEficiencia(estadistica) >= 80,
-                'text-warning': getEficiencia(estadistica) >= 60 && getEficiencia(estadistica) < 80,
-                'text-danger': getEficiencia(estadistica) < 60
-              }">
-                {{ getEficiencia(estadistica) }}%
-              </span>
-            </td>
-          </tr>
-        </ng-template>
-      </table>
-    </div>
-  </div>
 </div>

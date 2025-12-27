@@ -77,7 +77,7 @@ export class LoginComponent implements OnInit {
   private redirectToDashboard(): void {
     const userRole = this.authService.getUserRole();
     
-    switch(userRole) {
+    switch (userRole) {
       case 'Admin':
         this.router.navigate(['/admin/dashboard']);
         break;
@@ -85,7 +85,8 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/abogado/dashboard']);
         break;
       default:
-        this.router.navigate(['/usuario/mis-casos']);
+        // Si el rol no es válido, regresamos al login
+        this.authService.logout();
     }
   }
 

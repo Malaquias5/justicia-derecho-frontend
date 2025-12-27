@@ -78,16 +78,6 @@ export class AuthService {
           rol: 'Abogado',
         },
       },
-      usuario1: {
-        password: 'usuario123',
-        data: {
-          token: 'mock-token-usuario1',
-          usuario: 'usuario1',
-          nombreCompleto: 'Carlos Rodríguez',
-          email: 'carlos.rodriguez@mail.com',
-          rol: 'Usuario',
-        },
-      },
     };
 
     return new Observable((observer) => {
@@ -163,7 +153,7 @@ export class AuthService {
   }
 
   isUsuario(): boolean {
-    return this.getUserRole() === environment.roles.usuario;
+    return false;
   }
 
   private loadToken(): void {

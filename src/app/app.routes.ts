@@ -69,7 +69,7 @@ export const routes: Routes = [
           import('./components/admin/historial/historial.component').then(
             (m) => m.HistorialComponent
           ),
-        title: 'Historial de Cambios',
+        title: 'Historial de Usuarios',
       },
       {
         path: 'casos',
@@ -116,7 +116,7 @@ export const routes: Routes = [
   {
     path: 'abogado',
     canActivate: [authGuard, roleGuard],
-    data: { roles: ['Abogado', 'Admin'] },
+    data: { roles: ['Abogado'] },
     loadComponent: () =>
       import('./components/abogado/layout/abogado-layout.component').then(
         (m) => m.AbogadoLayoutComponent
@@ -176,14 +176,6 @@ export const routes: Routes = [
         title: 'Casos Próximos a Vencer',
       },
       {
-        path: 'calendario',
-        loadComponent: () =>
-          import('./components/abogado/calendario/calendario.component').then(
-            (m) => m.CalendarioComponent
-          ),
-        title: 'Calendario',
-      },
-      {
         path: 'documentos',
         loadComponent: () =>
           import('./components/abogado/documentos/documentos.component').then(
@@ -200,68 +192,6 @@ export const routes: Routes = [
         title: 'Seguimientos',
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-    ],
-  },
-
-  // Usuario Routes
-  {
-    path: 'usuario',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./components/usuario/layout/usuario-layout.component').then(
-        (m) => m.UsuarioLayoutComponent
-      ),
-    children: [
-      {
-        path: 'mis-casos',
-        loadComponent: () =>
-          import('./components/usuario/mis-casos/mis-casos.component').then(
-            (m) => m.MisCasosComponent
-          ),
-        title: 'Mis Casos',
-      },
-
-      {
-        path: 'seguimiento',
-        loadComponent: () =>
-          import('./components/usuario/seguimiento/seguimiento.component.js').then(
-            (m) => m.SeguimientoComponent
-          ),
-        title: 'Seguimiento',
-      },
-
-      {
-        path: 'configuracion',
-        loadComponent: () =>
-          import('./components/usuario/configuracion/configuracion.component.js').then(
-            (m) => m.ConfiguracionComponent
-          ),
-        title: 'Configuración',
-      },
-
-      {
-        path: 'ayuda',
-        loadComponent: () =>
-          import('./components/usuario/ayuda/ayuda.component.js').then((m) => m.AyudaComponent),
-        title: 'Ayuda',
-      },
-      {
-        path: 'documentos',
-        loadComponent: () =>
-          import('./components/abogado/documentos/documentos.component').then(
-            (m) => m.DocumentosComponent
-          ),
-        title: 'Documentos',
-      },
-      {
-        path: 'caso/:id',
-        loadComponent: () =>
-          import('./components/abogado/casos/detail/caso-detail.component').then(
-            (m) => m.CasoDetailComponent
-          ),
-        title: 'Detalle del Caso',
-      },
-      { path: '', redirectTo: 'mis-casos', pathMatch: 'full' },
     ],
   },
 
